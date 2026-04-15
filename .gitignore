@@ -1,0 +1,17 @@
+# Never commit real API keys or local .env
+.env
+.env.local
+.env.*.local
+
+# OS cruft
+.DS_Store
+Thumbs.db
+
+# Editor artifacts
+.vscode/
+.idea/
+*.swp
+
+# Crash logs from user reports
+crash.log
+*.crash

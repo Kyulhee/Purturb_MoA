@@ -1,0 +1,46 @@
+Nexus Science — Closed Beta Distribution License
+
+Copyright (c) 2026 Taewan Goo / BioNexus Fellows
+
+This binary distribution is provided under a closed beta license to
+invited users only. The following restrictions apply:
+
+1. **Scope of use**
+   The software may be used solely for personal evaluation and testing
+   by the individual to whom access was granted. Commercial use,
+   production deployment, or use on behalf of a third party requires
+   separate written permission.
+
+2. **Redistribution**
+   Redistribution of the binary, in whole or in part, to any party who
+   was not separately invited to the closed beta is prohibited. Do not
+   upload the binary to public package repositories, mirrors, or
+   file-sharing services.
+
+3. **Reverse engineering**
+   The binary embeds a Bun runtime and an application bundle.
+   Decompilation, disassembly, or any form of reverse engineering for
+   the purpose of reproducing the source code is not permitted during
+   the closed beta.
+
+4. **Warranty disclaimer**
+   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+   EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF
+   MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+   NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS
+   BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN
+   ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
+   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+   SOFTWARE.
+
+5. **Feedback**
+   Any bug reports, suggestions, or other feedback provided by the
+   beta user may be incorporated into the software without restriction
+   and without compensation.
+
+6. **Termination**
+   Access to this closed beta may be revoked at any time without
+   notice. Upon revocation, you must delete the binary and any derived
+   files from your systems.
+
+Questions: contact the person who invited you to the beta.
