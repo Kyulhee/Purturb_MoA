@@ -3,6 +3,13 @@
 .env.local
 .env.*.local
 
+# Binaries are distributed via GitHub Releases, not committed into the
+# repo itself. A rogue local copy would exceed the 100 MB file limit
+# on push. The release workflow uploads bin/nexus-science.exe with
+# `gh release create` instead.
+bin/
+*.exe
+
 # OS cruft
 .DS_Store
 Thumbs.db

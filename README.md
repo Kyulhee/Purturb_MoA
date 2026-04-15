@@ -10,17 +10,37 @@ NexusBrain 기반 AI 연구 에이전트의 **Windows 전용 단일 실행파일
 
 ## 설치 (3분)
 
-### 1. 다운로드
-
-**옵션 A — git**:
+### 1. 저장소 복제
 
 ```powershell
 git clone https://github.com/GooTec/nexus-science-win.git
 cd nexus-science-win
 ```
 
-**옵션 B — ZIP**: 저장소 페이지에서 "Code" → "Download ZIP" → 압축
-해제 → 원하는 폴더로 이동.
+또는 ZIP 다운로드: 저장소 페이지 → "Code" → "Download ZIP" → 압축 해제.
+
+이 저장소에는 **README, LICENSE, .env.example, CHANGELOG** 만 들어
+있습니다. 실제 실행파일은 아래 단계에서 별도로 다운로드합니다.
+
+### 1-1. Windows 실행파일 다운로드
+
+바이너리는 저장소가 아니라 **GitHub Releases** 에서 관리됩니다
+(파일 크기 때문에). 원하는 버전을 받으세요:
+
+- **최신 버전**: https://github.com/GooTec/nexus-science-win/releases/latest
+  에서 `nexus-science.exe` 클릭 → 다운로드
+- **특정 버전**: Releases 탭에서 해당 태그 선택
+- **CLI 사용자**: `gh release download --repo GooTec/nexus-science-win v0.1.3 --pattern nexus-science.exe`
+
+다운로드한 `nexus-science.exe` 를 저장소 폴더의 `bin\` 아래에
+넣으세요:
+
+```powershell
+mkdir bin
+move ~\Downloads\nexus-science.exe bin\nexus-science.exe
+```
+
+(경로는 예시. `bin\nexus-science.exe` 위치에 있으면 됩니다.)
 
 ### 2. `.env` 설정
 
