@@ -65,39 +65,41 @@ notepad .env
 ### 3. 실행
 
 ```powershell
-bin\nexus-science.exe --bare
+bin\nexus-science.exe
 ```
 
 정상 부팅되면 배너에 다음이 표시됩니다:
 
 ```
- Provider  OpenAI (custom)
+ Provider  OpenAI
  Model     glm-5.1-fp8
- Endpoint  https://...
+ Endpoint  https://attended-avi-las-ddr.trycloudflare.com...
 ```
 
 프롬프트에 `/help` 를 치면 사용 가능한 슬래시 커맨드 목록이 나옵니다.
 
 ---
 
-## `--bare` 플래그는 뭐고 왜 필요한가요?
+## GLM 5.1 호환성 플래그 (중요)
 
-현재 GLM 5.1 서버의 컨텍스트 한도가 **32,768 토큰**입니다. Nexus
-Science 의 기본 시스템 프롬프트(도구 설명 + 워크플로 가이드 포함)는
-이미 28,000 토큰에 가까워서, 대화 턴마다 입력 공간이 거의 남지
-않습니다.
+`.env.example` 에는 GLM 5.1 과 함께 쓸 때 **필수** 인 호환성 플래그
+두 개가 기본으로 설정돼 있습니다. 다른 제공자(Anthropic, OpenAI,
+Gemini via OpenRouter 등)로 바꿀 때는 이 플래그들을 꺼야 합니다.
 
-`--bare` 플래그는 "최소 시스템 프롬프트" 모드입니다:
+| 플래그 | 무엇을 하는가 | GLM | 그 외 |
+|---|---|---|---|
+| `CLAUDE_CODE_FLATTEN_USER_CONTENT=1` | 사용자 메시지 content를 array → string 으로 flatten | 필수 | OFF |
+| `CLAUDE_CODE_TOOL_RESULT_AS_USER=1` | `role: tool` 메시지를 `role: user` + 텍스트 프리픽스로 재작성 | 필수 | OFF |
 
-- 자동 메모리 / 스킬 자동 로드 / 플러그인 동기화 / hook / LSP 등을
-  건너뜁니다
-- 시스템 프롬프트가 약 5,000 토큰으로 줄어듭니다
-- 그 외 기능(도구 호출, 샌드박스, Task Gate 등)은 전부 그대로 작동
+**왜 필요한가**: GLM 5.1 chat template이 OpenAI 표준 `role: tool` 메시지
+타입을 인식하지 못해서, 도구 결과가 모델 context에 들어가지 않고 조용히
+사라집니다. 증상은 에이전트가 도구를 호출했는데 "도구가 빈 결과를
+반환했다" 고 반복 보고하는 것. 위 두 플래그가 이를 우회합니다.
 
-**서버가 128k 컨텍스트로 업그레이드된 이후에는** `.env` 에서
-`CLAUDE_CODE_MAX_OUTPUT_TOKENS=4096` 줄과 `--bare` 플래그 둘 다
-제거하고 실행하면 기본 기능이 전부 돌아옵니다. 이 저장소의 다음
-릴리스 노트에서 알려드립니다.
+이 두 플래그는 **opt-in 기본 OFF** 이고 `.env.example` 의 GLM 프로필
+섹션에만 포함돼 있습니다. 다른 제공자에게 요청을 보내면서 이 플래그가
+켜져 있으면 별 문제가 없을 가능성이 높지만 (text 형식도 대부분 파싱),
+공식 OpenAI 프로토콜 준수가 목적이라면 꺼 두세요.
 
 ---
 
@@ -176,9 +178,26 @@ git pull
 
 ### `400 Bad Request: maximum context length` 에러
 
-`CLAUDE_CODE_MAX_OUTPUT_TOKENS=4096` 이 `.env` 에 있는지 확인하고,
-실행 시 `--bare` 플래그를 붙였는지 확인하세요. 이 두 가지 없이 GLM 5.1
-(32k 컨텍스트) 로는 거의 실행되지 않습니다.
+`.env` 에 `CLAUDE_CODE_MAX_OUTPUT_TOKENS=16384` (또는 해당 모델의 컨텍스트
+크기에 맞는 값) 이 있는지 확인하세요. 기본값 32000은 작은 컨텍스트
+모델에서 자주 터집니다.
+
+서버가 32k 컨텍스트로 다운그레이드된 경우에는 `--bare` 플래그를 붙여서
+실행하면 시스템 프롬프트가 ~5k 토큰으로 줄어 컨텍스트 예산에 맞습니다
+(단 NexusScience-specific 도구는 로드되지 않음).
+
+### 에이전트가 "도구 결과가 비어 있다" 고 반복 보고합니다
+
+`.env` 에 다음 두 플래그가 **둘 다** 있는지 확인하세요:
+
+```
+CLAUDE_CODE_FLATTEN_USER_CONTENT=1
+CLAUDE_CODE_TOOL_RESULT_AS_USER=1
+```
+
+이 플래그 없이 GLM 5.1 과 함께 쓰면 tool_result 가 모델 context 에서
+사라져서 에이전트가 도구를 호출했다가 "empty" 로 오인합니다. 자세한
+설명은 위 "GLM 5.1 호환성 플래그" 섹션 참고.
 
 ### `.env` 가 안 읽힙니다
 
@@ -200,7 +219,7 @@ git pull
 crash log 를 찾아서 리포트해주세요:
 
 ```powershell
-bin\nexus-science.exe --bare 2> crash.log
+bin\nexus-science.exe 2> crash.log
 ```
 
 그 다음 `crash.log` 와 재현 단계를 GitHub Issues 에 올려주세요.
