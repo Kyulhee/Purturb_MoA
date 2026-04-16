@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.1.5 — 2026-04-16
+
+Binary: nexus-science.exe (131 MB, bun-windows-x64)
+Source revision: eba14b4 on branch fix/18-glm-context-window-token-overflow
+
+Change notes: see source repo commits up to the tag on this release.
+
 ## v0.1.4 — 2026-04-16
 
 Binary: nexus-science.exe (131 MB, bun-windows-x64)
