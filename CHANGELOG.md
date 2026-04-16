@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.1.4 — 2026-04-16
+
+Binary: nexus-science.exe (131 MB, bun-windows-x64)
+Source revision: e19f290 on branch main
+
+Change notes: see source repo commits up to the tag on this release.
+
 ## v0.1.3 — 2026-04-15
 
 Binary: nexus-science.exe (131 MB, bun-windows-x64)
