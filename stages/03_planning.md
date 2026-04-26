@@ -15,64 +15,90 @@
 
 ---
 
-## 검증된 핵심 지식
+## 연구 질문 (stages/02에서)
 
-### 1. 파이프라인 아키텍처
+**"대사 네트워크의 이종 그래프에서 GNN 대리 모델이 FBA 기반 탐색 공간 축소에 기여하는가?"**
+
+---
+
+## 1. 파이프라인 아키텍처
 
 ```
-Module A: FBA Ground Truth → Module B: GNN+XGBoost Surrogate → Module C: Active Learning Loop
-Module D: dFBA Simulation → Module E: NSGA-II Optimization → Module F: TOPSIS Decision
+Module A: FBA Ground Truth Generator
+  → Module B: GNN+XGBoost Surrogate Model
+  → Module C: Active Learning Loop (diversity → UCB)
 ```
 
-의존 구조: A→B→C (Phase 3), D→E→F (Phase 4), C↔D (AL↔dFBA 양방향)
+의존: A→B→C 단방향. C의 AL 선택이 A의 FBA 호출을 유발하며, B가 재학습됨.
 
-### 2. 설계 결정과 근거
+## 2. 설계 결정과 근거
 
 | 설계 결정 | 근거 | 대안 검토 |
 |-----------|------|----------|
-| HGTConv 2층 이종그래프 GNN | metabolite/reaction/gene 3노드타입에 자연 대응 | GCNConv(동종그래프만), GATConv(이종 미지원) |
+| HGTConv 2층 이종그래프 GNN | metabolite/reaction/gene 3노드타입에 자연 대응 | GCNConv(동종만), GATConv(이종 미지원), RGCNConv(관계형, 검토 가능) |
 | GNN 임베딩 + XGBoost 분리 | multi-objective loss 분리 최적화 (이전 Loss 불균형 교훈) | End-to-end GNN (loss 충돌 위험) |
 | GNN fine-tuning 허용 | pretrained component fine-tuning 필수 (이전 encoder 동결 교훈) | GNN 동결 (성능 상한 제한) |
-| scipy BDF/Radau dFBA 직접 구현 | FLYCOP 삭제, COMETS Java 의존 회피, 수치 안정성 확보 | COMETS(Java), Euler(5.7x 과대) |
-| TOPSIS Expert(0.7/0.3) + Entropy 보조 | Expert tau=0.73, top3=100% (가장 안정) | Entropy only(tau=0.41) |
-| Active Learning two-phase (diversity→UCB) | R2<0일 때 uncertainty 무효, diversity로 초기 탐색 | UCB from start (R2<0에서 무효) |
-| NSGA-II 다목적 최적화 | pymoo 0.6.1.6 검증, Pareto front 30해 도출 | 단일 목적 최적화 (trade-off 불가) |
+| Active Learning two-phase | R2<0에서 uncertainty 무효, diversity로 초기 탐색 | UCB from start (R2<0에서 무효) |
+| COBRApy multiprocessing | FBA 병렬 실행으로 샘플 생성 가속 | 직렬 (8x 느림) |
 
-### 3. 이전 실패 교훈의 설계 반영
+## 3. 실험 설계
 
-| 이전 실패 | 설계 원칙 | 구체적 반영 |
-|-----------|----------|------------|
+### Module A: FBA Ground Truth Generator
+- **입력**: COBRApy 모델(textbook), knockout_strategy(single/double/random_subset)
+- **출력**: (knockout_mask, growth_rate) 쌍
+- **그래프 변환**: metabolite(72), reaction(95), gene(137) 3노드타입 이종그래프
+  - 엣지: met→rxn(stoichiometry): 188+172, gene→rxn(GPR): 158
+- **샘플 생성 계획**:
+  - 초기: random 2,000샘플 (8-core ~24s)
+  - AL 라운드당: 50샘플 (~0.6s)
+  - 총 목표: 3,000-5,000샘플
+
+### Module B: GNN+XGBoost Surrogate
+- **GNN**: HGTConv 2층, hidden=32, heads=2
+- **Pretraining**: autoencoder → edge prediction / contrastive loss (선택)
+- **임베딩**: graph_emb(gene mean pooling) + knockout_mask concat → 169차원 (32+137)
+- **XGBoost**: 임베딩 입력, objective=reg:squarederror
+- **학습/평가**: 80/20 split, 5-fold CV
+- **하이퍼파라미터 탐색**: GNN(hidden: [16,32,64], heads: [2,4]), XGBoost(max_depth: [3,6,9], lr: [0.01,0.1,0.3])
+
+### Module C: Active Learning Loop
+- **Phase 1 (R2 < 0.3)**: diversity 전략 — 임베딩 공간에서 최대한 먼 샘플 선택
+- **Phase 2 (R2 >= 0.3)**: UCB 전략 — exploitation(high predicted growth) + exploration(high uncertainty)
+- **전환 조건**: validation R2가 0.3을 안정적으로 상회 (3연속 epoch)
+- **AL 라운드**: 50샘플씩, 최대 20라운드 (총 1,000 추가샘플)
+
+## 4. 평가 설계
+
+| 실험 | 비교 대상 | 지표 | 타겟 |
+|------|----------|------|------|
+| GNN 임베딩 효과 | XGBoost-only(mask) vs GNN+XGBoost | R2, RMSE | R2 > 0.5 |
+| AL 탐색 효율 | Random screening vs AL | FBA 호출 수 (동일 R2 도달) | > 70% 감소 |
+| AL 전환 조건 | diversity-only vs two-phase | R2 수렴 곡선 | R2=0.3에서 전환 시 수렴 가속 |
+| GNN pretraining | autoencoder vs edge prediction vs contrastive | R2 | 최고 성능 pretraining 선택 |
+
+## 5. 이전 실패 교훈의 설계 반영
+
+| 이전 실패 | 설계 원칙 | 본 실험 반영 |
+|-----------|----------|-------------|
 | Loss 불균형 (50:1) | multi-objective loss는 분리 최적화 | GNN embedding loss ≠ XGBoost prediction loss |
-| Encoder 동결 | pretrained component fine-tuning 허용 | GNN autoencoder pretrain → fine-tune with AL |
-| 평가 오류 | 평가지표는 태스크와 일치해야 함 | TOPSIS ranking stability (Kendall's tau) |
+| Encoder 동결 | pretrained component fine-tuning 허용 | GNN pretrain → fine-tune with AL |
+| 평가 오류 | 평가지표는 태스크 정의와 일치 | surrogate R2 + AL 호출 감소율 (clustering metric 아님) |
 
-### 4. 컴퓨팅 자원 추정
+## 6. 핵심 리스크와 완화
 
-**COBRApy FBA 병렬 실행 (8-core 기준):**
-- Single knockout 137: ~2s | Double knockout 9,316: ~2min | Random 5,000: ~1min
-- iJO1366 double knockout 934K: ~10h (FBA당 ~300ms 추정)
+1. **샘플 부족(135→2,000+필요)** → COBRApy multiprocessing으로 2,000샘플 ~24s 생성, AL로 점진적 증가
+2. **GNN pretraining 품질**(autoencoder loss 366K→365K로 거의 학습 안 됨) → edge prediction/contrastive pretraining으로 대체, ablation으로 비교
+3. **AL 전환 시점 모호성** → validation R2 3연속 epoch 기준으로 자동 판단, 임계값(0.3)은 ablation으로 검증
 
-**GNN 학습:** textbook 모델 5,000샘플 → 10-30min (CPU), 5-10x 가속 (GPU)
+## 7. 컴퓨팅 자원 추정
 
-**NSGA-II + dFBA:**
-- 소규모(pop=30, gen=50): 1,500 eval × 0.78s = ~20min (textbook)
-- 전체(pop=100, gen=200): 20,000 eval × 0.78s = ~4.3h (textbook), ~10-20h (iJO1366)
-
-### 5. 핵심 리스크와 완화 전략
-
-**Phase 3:**
-1. 샘플 부족(135→500+필요) → COBRApy multiprocessing + random 5,000샘플 초기 학습 → AL로 추가
-2. GNN 임베딩 품질(autoencoder 거의 학습 안 됨) → edge prediction / contrastive pretraining으로 대체
-3. AL 전환 시점(UCB가 R2>0.3 이후에만 유효) → validation R2 모니터링 자동 전환
-
-**Phase 4:**
-1. NSGA-II+dFBA 계산비용(4-20h) → 소규모 초기 탐색 → surrogate-assisted NSGA-II
-2. dFBA 초기 조건 민감도 → Latin Hypercube Sampling + COBRApy 기본 조건 베이스라인
-3. NSGA-II 수렴 불확실성 → Hypervolume 모니터링, NSGA-III 대안 검토
-
-### 6. 실현성 평가
-- **Phase 3**: MEDIUM — 데이터 증강 + GNN pretraining 개선으로 R2 > 0.3 도달 가능, 0.5는 AL 루프에 달림
-- **Phase 4**: MEDIUM — BDF/Radau 검증, TOPSIS 안정, NSGA-II+BDF 계산비용은 완화 전략 존재
+| 단계 | 예상 시간 (8-core CPU) | 비고 |
+|------|----------------------|------|
+| FBA 2,000샘플 생성 | ~24s | textbook 모델, multiprocessing |
+| GNN pretraining | 5-15min | 모델 크기에 따라 |
+| GNN+XGBoost 학습 | 1-5min | XGBoost는 빠름 |
+| AL 20라운드 | 30-60min | 라운드당 재학습+FBA 50샘플 |
+| 총 예상 | ~1-2h | textbook 모델 기준 |
 
 ---
 
