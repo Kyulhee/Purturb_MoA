@@ -1,7 +1,7 @@
 # CLAUDE.md — Project Orchestrator
 
 ## Current Stage
-`03_planning`
+`04_analysis`
 
 ## Stage Map
 | Stage | Name | Guide | State File | Outputs |
