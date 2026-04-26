@@ -16,46 +16,53 @@
 
 ---
 
-## 검증된 핵심 지식
+## 연구 질문
 
-### 연구 질문
-**"대조 학습 기반 약물 임베딩이 sci-Plex 단일 세포 섭동 데이터에서 MoA 클러스터링 품질을 개선하는가?"**
+**"GNN+XGBoost 대리 모델 기반 Active Learning이 대사 네트워크 최적화 탐색 효율을 개선하는가?"**
+
+도출 근거: Literature gap 3-4 — 대사 네트워크 최적화에서 FBA 기반 탐색은 조합 폭발에 직면하며, GNN 대리 모델 + Active Learning로 탐색 효율을 개선할 여지는 존재하나 실증 부재. dFBA 수치 안정성 문제와 다목적 최적화 통합 사례도 부재.
 
 ### 평가 전략
 | 평가 방식 | 지표 | 비고 |
 |-----------|------|------|
-| leave-compound-out | Top-1 accuracy, F1 macro | 분류 (보이지 않는 약물) |
-| leave-MoA-out | Silhouette, ARI, NMI | **클러스터링 품질** (분류 accuracy 아님) |
-| Alignment/Uniformity | alignment score, uniformity score | Wang & Isola 기반 |
+| Surrogate 예측력 | R2, RMSE | FBA 정답 대비 대리 모델 정확도 |
+| AL 탐색 효율 | FBA 호출 수 감소율 | 동일 성능 도달 시 호출 수 비교 |
+| 다목적 최적화 | Pareto front 품질 | NSGA-II 해의 수와 분포 |
+| 의사결정 안정성 | TOPSIS Kendall's tau | 가중치 섭동 시 랭킹 안정성 |
 
 ### 베이스라인 계층
-1. Random: ~6.25% (16개 클래스)
-2. Simple DNN (GPAR-style): 978→512→256
-3. PANACEA top methods
-4. chemCPA: r²=0.68 (DEGs, pretrained)
-5. Our method (대조 학습 + MoA-aware)
+1. Random screening
+2. GNN-only surrogate (no XGBoost)
+3. XGBoost-only (no GNN, raw features)
+4. GNN+XGBoost without Active Learning
+5. GNN+XGBoost + Active Learning (제안 방법)
 
 ### 타겟 수치
-- leave-compound-out Top-1 > 60%
-- leave-MoA-out ARI > 0.30
-- Alignment 50% 개선 (vs non-contrastive)
+- Surrogate R2 > 0.5 (현재 best -0.11, 개선 필요)
+- FBA 호출 70-90% 감소 (vs random screening)
+- Pareto front 해 30개 이상 (NSGA-II)
 
 ### 데이터
-- sci-Plex3: GEO GSE139944 (GSM4150378)
-- chemCPA 전처리 h5ad 다운로드 가능
-- **16개 MoA 카테고리** (pathway_level_1, "Other" 처리 결정 필요)
+- COBRApy textbook 모델: 95 rxn, 72 met, 137 genes
+- iJO1366 (E. coli): 2583 rxn, 1805 met, 1367 genes
+- BiGG 108개 공개 모델
 
-### 미해결
-- 실제 데이터 다운로드 + MoA 분포 정량 확인 (다운로드 진행 중이었음)
-- "Other" 카테고리 제외 vs 포함 결정
-- Simple DNN baseline 수치 측정 (Planning/Analysis에서)
+---
 
-### 다음 단계에 전달
-1. Loss weight 설계: L_recon vs L_contrastive 균형 (절대값이 아닌 effective gradient 기준)
-2. Drug encoder fine-tuning 허용 필수
-3. 데이터 다운로드 후 MoA 분포 → 클래스 불균형 대응 전략
+## 이전 연구 질문 (종료)
+
+**"대조 학습 기반 약물 임베딩이 sci-Plex 단일 세포 섭동 데이터에서 MoA 클러스터링 품질을 개선하는가?"**
+
+도출 근거: Literature gap 1-2. 종료 사유: Loss 불균형/encoder 동결/평가오류의 근본 원인이 설계 단계부터 존재했으며, 동일 문제에서 재시도보다 새로운 문제 설정이 합리적.
+
+### 이전 질문에서 현재 질문으로의 교훈 이전
+| 이전 실패 | 교훈 | 현재 질문 반영 |
+|-----------|------|---------------|
+| Loss 불균형 (50:1) | multi-objective loss는 분리 최적화 | GNN loss + XGBoost loss 분리 |
+| Encoder 동결 | pretrained component fine-tuning 필수 | GNN fine-tuning 허용 |
+| 평가 오류 (leave-MoA-out 분류) | 평가지표는 태스크 정의와 일치 | TOPSIS + Entropy weight 객관화 |
 
 ---
 
 ## Run 이력 (세부 내용은 outputs/framing/run_XX/ 참조)
-- run_01: 연구 질문/평가 전략/베이스라인 계층/타겟 수치 정의. MoA 16개 확인. 데이터 다운로드 진행 중
+- run_01: 이전 질문(Perturb-seq MoA) 정의. MoA 16개 확인, 평가 전략/베이스라인/타겟 설정

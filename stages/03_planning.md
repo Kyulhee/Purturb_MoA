@@ -15,75 +15,66 @@
 
 ---
 
-## 검증된 핵심 지식 (모든 run에서 통합)
+## 검증된 핵심 지식
 
-### 1. 치명적 설계 결함 3가지 (run_01 실패 원인, 반복 금지)
-| 결함 | 교훈 | 올바른 설계 |
-|------|------|------------|
-| Loss 불균형 (50:1) | effective gradient 크기로 weight 설계 | L_recon weight 0.01~0.05 또는 MoA loss 10~50배 증폭 |
-| Drug encoder 동결 | 사전학습 후에도 fine-tuning 필요 | LR 차등 적용(1:10~1:100) 또는 동결 해제 |
-| leave-MoA-out 분류 평가 | 학습되지 않은 라벨 분류 불가 | 클러스터링 품질(silhouette, ARI, NMI)로 평가 |
-
-### 2. 아키텍처 유효 성분
-- rFCFP 인코딩, metric prototype head, 대조 손실 아이디어: 유효
-- z_perturb.detach(): 재구성/MoA gradient 분리에 필요
-- 구현 디테일(loss 비율, 동결, 평가)에서 실패했을 뿐 구조는 타당
-
-### 3. Phase 3-4 통합 아키텍처
+### 1. 파이프라인 아키텍처
 
 ```
-Module A: FBA Ground Truth (COBRApy 병렬, 10K조합 ~10-30분)
-    → Module B: GNN+XGBoost Surrogate (HGTConv 3층 + XGBoost)
-    → Module C: Active Learning Loop (UCB/EI, FBA 호출 70-90% 감소)
-    → Module D: COMETS dFBA (Java 필수, dfba-python 대안)
-    → Module E: NSGA-II (pymoo, 접종 비율 최적화, 3목적)
-    → Module F: TOPSIS/Pareto (Entropy weight + 민감도 분석)
+Module A: FBA Ground Truth → Module B: GNN+XGBoost Surrogate → Module C: Active Learning Loop
+Module D: dFBA Simulation → Module E: NSGA-II Optimization → Module F: TOPSIS Decision
 ```
 
-**의존 구조**: A→B→C (Phase 3), D→E→F (Phase 4), C↔D (Active Learning 양방향)
+의존 구조: A→B→C (Phase 3), D→E→F (Phase 4), C↔D (AL↔dFBA 양방향)
 
-### 4. Phase 실현성 평가
-- **Phase 3**: MEDIUM-HIGH (GNN 임베딩 동적 특성 포착, 일반화 리스크)
-- **Phase 4**: MEDIUM (FLYCOP 불가→COMETS 대체, dFBA 수치 안정성, NSGA-II 계산 비용)
+### 2. 설계 결정과 근거
 
-### 5. FLYCOP 대체 전략 (저장소 삭제 확인)
-- FLYCOP: 저장소 삭제, 사용 불가. 원논문 전문도 접근 불가
-- 대체: COMETS v2.12.4 (dFBA+공간), dfba-python (비공간 순수 Python)
-- FLYCOP의 fuzzy 다목적 평가 → TOPSIS + Entropy weight로 객관화 대체
+| 설계 결정 | 근거 | 대안 검토 |
+|-----------|------|----------|
+| HGTConv 2층 이종그래프 GNN | metabolite/reaction/gene 3노드타입에 자연 대응 | GCNConv(동종그래프만), GATConv(이종 미지원) |
+| GNN 임베딩 + XGBoost 분리 | multi-objective loss 분리 최적화 (이전 Loss 불균형 교훈) | End-to-end GNN (loss 충돌 위험) |
+| GNN fine-tuning 허용 | pretrained component fine-tuning 필수 (이전 encoder 동결 교훈) | GNN 동결 (성능 상한 제한) |
+| scipy BDF/Radau dFBA 직접 구현 | FLYCOP 삭제, COMETS Java 의존 회피, 수치 안정성 확보 | COMETS(Java), Euler(5.7x 과대) |
+| TOPSIS Expert(0.7/0.3) + Entropy 보조 | Expert tau=0.73, top3=100% (가장 안정) | Entropy only(tau=0.41) |
+| Active Learning two-phase (diversity→UCB) | R2<0일 때 uncertainty 무효, diversity로 초기 탐색 | UCB from start (R2<0에서 무효) |
+| NSGA-II 다목적 최적화 | pymoo 0.6.1.6 검증, Pareto front 30해 도출 | 단일 목적 최적화 (trade-off 불가) |
 
-### 6. COMETS 설치 검증 결과
-- cometspy v0.6.3: pip 설치 성공, Python 인터페이스 정상
-- **COMETS Java 코어 필수**: COMETS_HOME 환경변수 설정 필요
-- 대안: Docker 컨테이너 활용 또는 dfba-python (순수 Python, Java 불필요)
+### 3. 이전 실패 교훈의 설계 반영
 
-### 7. 오픈소스 도구
-| 도구 | 버전 | 용도 | URL |
-|------|------|------|-----|
-| COBRApy | 0.31.1 | FBA | https://github.com/opencobra/cobrapy |
-| PyTorch Geometric | latest | 이종 GNN | https://github.com/pyg-team/pytorch_geometric |
-| XGBoost | latest | 회귀 | https://github.com/dmlc/xgboost |
-| COMETS | 2.12.4 | dFBA | https://github.com/segrelab/COMETS |
-| cometspy | 0.6.3 | COMETS Python | https://github.com/segrelab/cometspy |
-| pymoo | latest | NSGA-II | https://github.com/anyoptimization/pymoo |
+| 이전 실패 | 설계 원칙 | 구체적 반영 |
+|-----------|----------|------------|
+| Loss 불균형 (50:1) | multi-objective loss는 분리 최적화 | GNN embedding loss ≠ XGBoost prediction loss |
+| Encoder 동결 | pretrained component fine-tuning 허용 | GNN autoencoder pretrain → fine-tune with AL |
+| 평가 오류 | 평가지표는 태스크와 일치해야 함 | TOPSIS ranking stability (Kendall's tau) |
 
-### 8. 리소스 관리 규칙
-- RAM < 4GB, Disk < 10GB 시 작업 중단 + 사용자 보고
-- Multi-Agent ≤ 3개 동시 (RAM 40GB 기준)
-- GNN/FBA 메모리 집약 에이전트는 1개만
+### 4. 컴퓨팅 자원 추정
 
----
+**COBRApy FBA 병렬 실행 (8-core 기준):**
+- Single knockout 137: ~2s | Double knockout 9,316: ~2min | Random 5,000: ~1min
+- iJO1366 double knockout 934K: ~10h (FBA당 ~300ms 추정)
 
-## 다음 단계 (미해결)
-1. COMETS Java 코어 설치 또는 dfba-python으로 dFBA 실행 검증
-2. GNN 대사 네트워크 변환 프로토타입 완료 (백그라운드 진행 중)
-3. COBRApy 병렬 FBA 벤치마크 완료 (백그라운드 진행 중)
-4. 실제 sci-Plex 데이터 사용 (합성 데이터 한계 확인됨)
-5. Loss weight 재설계: effective gradient 기반
-6. 사용자 컨펌 절차 의무화
+**GNN 학습:** textbook 모델 5,000샘플 → 10-30min (CPU), 5-10x 가속 (GPU)
+
+**NSGA-II + dFBA:**
+- 소규모(pop=30, gen=50): 1,500 eval × 0.78s = ~20min (textbook)
+- 전체(pop=100, gen=200): 20,000 eval × 0.78s = ~4.3h (textbook), ~10-20h (iJO1366)
+
+### 5. 핵심 리스크와 완화 전략
+
+**Phase 3:**
+1. 샘플 부족(135→500+필요) → COBRApy multiprocessing + random 5,000샘플 초기 학습 → AL로 추가
+2. GNN 임베딩 품질(autoencoder 거의 학습 안 됨) → edge prediction / contrastive pretraining으로 대체
+3. AL 전환 시점(UCB가 R2>0.3 이후에만 유효) → validation R2 모니터링 자동 전환
+
+**Phase 4:**
+1. NSGA-II+dFBA 계산비용(4-20h) → 소규모 초기 탐색 → surrogate-assisted NSGA-II
+2. dFBA 초기 조건 민감도 → Latin Hypercube Sampling + COBRApy 기본 조건 베이스라인
+3. NSGA-II 수렴 불확실성 → Hypervolume 모니터링, NSGA-III 대안 검토
+
+### 6. 실현성 평가
+- **Phase 3**: MEDIUM — 데이터 증강 + GNN pretraining 개선으로 R2 > 0.3 도달 가능, 0.5는 AL 루프에 달림
+- **Phase 4**: MEDIUM — BDF/Radau 검증, TOPSIS 안정, NSGA-II+BDF 계산비용은 완화 전략 존재
 
 ---
 
 ## Run 이력 (세부 내용은 outputs/planning/run_XX/ 참조)
-- run_01: 임계값 분류+MoA 계획 → 3가지 치명적 결함으로 Analysis 전면 실패
-- run_02: Phase 3-4 기술실현성 분석 → FLYCOP 삭제 확인, COMETS 대체
-- run_03: 통합 아키텍처 설계 + 6모듈 정의 + 리소스 규칙 + FLYCOP/COMETS 분석
+- run_01: Phase 3-4 기술실현성 심층 분석. 상세 보고서: outputs/planning/run_01/phase3_4_deep_feasibility_20260426.md

@@ -5,6 +5,7 @@
 - [ ] 결과의 생물학적/도메인적 의미 해석
 - [ ] 한계점(limitation) 명시
 - [ ] 후속 연구 방향 제안
+- [ ] 식별된 실패 원인이 다음 연구에 전달될 수 있는 형태로 정리되었는가?
 - [ ] 최종 리포트 작성
 - [ ] outputs/interpretation/run_XX/에 산출물 저장
 - [ ] stages/05_interpretation.md의 Current State 업데이트

@@ -12,21 +12,22 @@
 ## Done when
 - 최종 리포트 작성 완료
 - 한계점 및 후속 방향 명시됨
+- 식별된 실패 원인이 다음 연구에 전달 가능한 형태로 정리됨
 
 ---
 
 ## 검증된 핵심 지식
 
-### 이전 run 한계
-- run_01 리포트는 Analysis 성능 미달 상태에서의 임시 해석
-- 근본 원인(상위 단계 불충분)이 진단되지 않은 채 작성됨
-- 이후 원인 분석: Framing(평가 오정의) + Planning(loss 불균형, 동결) + Literature(베이스라인 미확보)
-
-### 원칙
-- **Analysis에서 의미 있는 성능이 나온 후에만 Interpretation 진행**
-- 미달 시 "Analysis 미달, 루프백"으로 처리
+### 이전 연구에서 전달된 실패 원인
+| 원인 | 단계 | 전달 내용 |
+|------|------|----------|
+| Loss 불균형 (50:1) | Planning | multi-objective loss는 반드시 분리 최적화 |
+| Encoder 동결 | Planning | pretrained component fine-tuning 필수 |
+| 평가 오류 (leave-MoA-out 분류) | Framing | 평가지표는 태스크 정의와 일치해야 함 |
+| Surrogate R2 < 0 (135샘플) | Analysis | GNN+XGBoost는 샘플 수 >= 500 필요 |
+| Euler dFBA 불안정 | Analysis | stiff ODE에는 implicit solver(BDF/Radau) 필수 |
+| AL uncertainty 무효 | Analysis | 모델 R2 > 0.3 이후에만 uncertainty 기반 AL 사용 |
 
 ---
 
 ## Run 이력 (세부 내용은 outputs/interpretation/run_XX/ 참조)
-- run_01: 임시 리포트 작성. 근본 원인 미진단 상태. 의미 있는 해석을 위해서는 전체 워크플로우 재진행 필요

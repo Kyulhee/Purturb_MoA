@@ -16,31 +16,17 @@
 
 ## 검증된 핵심 지식
 
-### 치명적 실패 원인 (run_01, 재발 방지)
-**3중 실패: Framing + Planning + Data** — 이 중 하나라도 해결 안 되면 재시도 불가
+(아직 검증된 결과 없음 — 새로운 run 시작 시 이 섹션에 설계 결정의 검증 결과를 누적)
 
-1. **Framing**: leave-MoA-out 분류 accuracy → 구조적 0% 보장 → 클러스터링 품질로만 평가
-2. **Planning**: L_recon 99.5% gradient → MoA 분리 무시 → effective gradient 기반 weight 필수
-3. **Data**: 합성 데이터만 사용 → 신호 약함 → **실제 sci-Plex 데이터 필수**
+---
 
-### 학습 역설 (run_01에서 관찰)
-- accuracy가 학습 진행에 따라 하락 (84%→76%)
-- 재구성 개선 ↔ MoA 분리 악화 → loss 불균형의 직접적 증거
-
-### 재시도 전제조건 (모두 충족 필요)
-1. 실제 sci-Plex 데이터 사용
-2. Loss weight effective gradient 기반 설계
-3. Drug encoder 동결 해제 또는 LR 차등 적용
-4. Leave-MoA-out = 클러스터링 품질 평가
-
-### V2 결과 (참고용, 합성 데이터)
-| 분할 | Cls Top-1 | Metric Top-1 | Zero-Shot |
-|------|-----------|-------------|-----------|
-| random | 0.76 | 0.55 | 1.00 |
-| leave_compound_out | 0.13 | 0.09 | 0.09 |
-| leave_moa_out | 0.00 | 0.00 | 0.00 |
+## 다음 단계
+1. Step 0: 데이터 접근성 검증 (COBRApy 모델, GNN 라이브러리)
+2. Step 1-2: 기존 분석 재현 + 결과 확인
+3. Step 3: 스몰 서브셋 모듈별 구현-검증 (A→B→C→D→E→F)
+4. Step 4: Baseline 비교 + 모듈 Ablation
+5. Step 5: Full-scale Benchmark (iJO1366)
 
 ---
 
 ## Run 이력 (세부 내용은 outputs/analysis/run_XX/ 참조)
-- run_01: 합성 데이터 Perturb-seq MOA. LCO 9%, LMO 0%. 3중 실패(Framing+Planning+Data) → Literature Review로 루프백
