@@ -18,51 +18,53 @@
 
 ## 연구 질문
 
-**"GNN+XGBoost 대리 모델 기반 Active Learning이 대사 네트워크 최적화 탐색 효율을 개선하는가?"**
+**"대사 네트워크의 이종 그래프에서 GNN 대리 모델이 FBA 기반 탐색 공간 축소에 기여하는가?"**
 
-도출 근거: Literature gap 3-4 — 대사 네트워크 최적화에서 FBA 기반 탐색은 조합 폭발에 직면하며, GNN 대리 모델 + Active Learning로 탐색 효율을 개선할 여지는 존재하나 실증 부재. dFBA 수치 안정성 문제와 다목적 최적화 통합 사례도 부재.
+### 도출 근거
+- Literature Gap 1: 대사 네트워크 이종 그래프(metabolite/reaction/gene)에 GNN surrogate 적용 사례 부재, 현재 135샘플 R2=-0.31
+- Literature Gap 2: R2<0에서 uncertainty 기반 AL이 무효, diversity→UCB 전환 조건 미검증
+- Gap 1-2는 하나의 인과 체인: surrogate 예측력(R2)이 AL 유효성의 전제조건, AL이 surrogate 개선(샘플 효율)의 수단
+
+### 질문이 답하는 것과 답하지 않는 것
+- **답하는 것**: GNN 이종 그래프 임베딩이 knockout_mask 직접 사용보다 surrogate 예측력을 높이는가? AL이 random screening 대비 FBA 호출을 줄이는가?
+- **답하지 않는 것**: dFBA+NSGA-II 통합 파이프라인의 수렴 보장, TOPSIS 가중치의 주관성 해소 → 후속 연구
 
 ### 평가 전략
-| 평가 방식 | 지표 | 비고 |
-|-----------|------|------|
-| Surrogate 예측력 | R2, RMSE | FBA 정답 대비 대리 모델 정확도 |
-| AL 탐색 효율 | FBA 호출 수 감소율 | 동일 성능 도달 시 호출 수 비교 |
-| 다목적 최적화 | Pareto front 품질 | NSGA-II 해의 수와 분포 |
-| 의사결정 안정성 | TOPSIS Kendall's tau | 가중치 섭동 시 랭킹 안정성 |
+| 평가 방식 | 지표 | 베이스라인 | 타겟 | 비고 |
+|-----------|------|----------|------|------|
+| Surrogate 예측력 | R2 | -0.11 (GNN-linear) | > 0.5 | FBA 정답 대비. knockout_mask만 R2=-0.31 |
+| AL 탐색 효율 | FBA 호출 감소율 | 0% (random) | > 70% | 동일 R2 도달 시 호출 수 비교 |
+| AL 전환 조건 | diversity→UCB 전환 R2 | 미확인 | 0.3 | UCB가 diversity를 역전하는 R2 임계값 |
 
-### 베이스라인 계층
-1. Random screening
-2. GNN-only surrogate (no XGBoost)
-3. XGBoost-only (no GNN, raw features)
-4. GNN+XGBoost without Active Learning
-5. GNN+XGBoost + Active Learning (제안 방법)
-
-### 타겟 수치
-- Surrogate R2 > 0.5 (현재 best -0.11, 개선 필요)
-- FBA 호출 70-90% 감소 (vs random screening)
-- Pareto front 해 30개 이상 (NSGA-II)
+### 베이스라인 계층 (surrogate 예측력)
+1. Random screening (FBA 전수) — 하한
+2. XGBoost-only, knockout_mask 입력 (R2=-0.31) — GNN 임베딩 없음
+3. GNN-only, linear head (R2=-0.11) — XGBoost 없음
+4. GNN+XGBoost, no AL — 제안 방법의 AL 제외 변형
+5. GNN+XGBoost + AL (제안 방법) — 상한
 
 ### 데이터
-- COBRApy textbook 모델: 95 rxn, 72 met, 137 genes
-- iJO1366 (E. coli): 2583 rxn, 1805 met, 1367 genes
-- BiGG 108개 공개 모델
+- COBRApy textbook 모델: 95 rxn, 72 met, 137 genes (개발/검증)
+- iJO1366 (E. coli): 2583 rxn, 1805 met, 1367 genes (확장 검증)
+- BiGG 108개 공개 모델 (일반화 테스트)
+
+### 이전 실패에서의 설계 원칙
+| 이전 실패 | 설계 원칙 | 본 질문에서의 반영 |
+|-----------|----------|-------------------|
+| Loss 불균형 (50:1) | multi-objective loss는 분리 최적화 | GNN embedding loss ≠ XGBoost prediction loss |
+| Encoder 동결 | pretrained component fine-tuning 필수 | GNN fine-tuning 허용 |
+| 평가 오류 | 평가지표는 태스크 정의와 일치 | clustering metric → surrogate R2로 직결 |
 
 ---
 
-## 이전 연구 질문 (종료)
+## 후속 질문 (본 질문 달성 후)
 
-**"대조 학습 기반 약물 임베딩이 sci-Plex 단일 세포 섭동 데이터에서 MoA 클러스터링 품질을 개선하는가?"**
+**"dFBA 시뮬레이션 기반 NSGA-II 다목적 최적화가 미생물 군집 설계에서 Pareto 최적해를 안정적으로 도출하는가?"**
 
-도출 근거: Literature gap 1-2. 종료 사유: Loss 불균형/encoder 동결/평가오류의 근본 원인이 설계 단계부터 존재했으며, 동일 문제에서 재시도보다 새로운 문제 설정이 합리적.
-
-### 이전 질문에서 현재 질문으로의 교훈 이전
-| 이전 실패 | 교훈 | 현재 질문 반영 |
-|-----------|------|---------------|
-| Loss 불균형 (50:1) | multi-objective loss는 분리 최적화 | GNN loss + XGBoost loss 분리 |
-| Encoder 동결 | pretrained component fine-tuning 필수 | GNN fine-tuning 허용 |
-| 평가 오류 (leave-MoA-out 분류) | 평가지표는 태스크 정의와 일치 | TOPSIS + Entropy weight 객관화 |
+- 도출 근거: Literature Gap 3-4
+- 전제조건: 본 질문에서 surrogate R2 > 0.5 달성 → surrogate-assisted NSGA-II 가능
+- 본 질문 실패 시에도 brute-force dFBA+NSGA-II로 진행 가능하나 계산비용 급증
 
 ---
 
 ## Run 이력 (세부 내용은 outputs/framing/run_XX/ 참조)
-- run_01: 이전 질문(Perturb-seq MoA) 정의. MoA 16개 확인, 평가 전략/베이스라인/타겟 설정
