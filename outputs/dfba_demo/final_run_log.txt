@@ -1,0 +1,74 @@
+============================================================
+Fix jdistlib, Recompile COMETS, Run dFBA Demo
+============================================================
+
+--- Step 1: Fix jdistlib ---
+  Removed corrupted file
+  Trying: https://repo1.maven.org/maven2/io/github/alexengird/jdistlib/0.4.5/jdistlib-0.4.5.jar
+  Failed: HTTP Error 404: Not Found
+  Trying: https://jcenter.bintray.com/jdistlib/jdistlib/0.4.5/jdistlib-0.4.5.jar
+  Failed: HTTP Error 404: Not Found
+  Creating valid stub JAR for jdistlib...
+  Stub compilation: 0
+  JAR creation: 0
+  Created valid stub JAR (3895 bytes)
+  JAR verification: OK
+
+--- Step 2: Compile COMETS ---
+Valid classpath: 26 JARs
+Compiling 56 Java files...
+Compile return code: 1
+Errors: 29, Warnings: 1
+First 3000 chars of stderr:
+warning: Supported source version 'RELEASE_6' from annotation processor 'com.jogamp.gluegen.structgen.CStructAnnotationProcessor' less than -source '17'
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\edu\bu\segrelab\comets\fba\FBACell.java:27: error: package jdistlib.rng does not exist
+import jdistlib.rng.MersenneTwister;
+                   ^
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\edu\bu\segrelab\comets\fba\FBAWorld.java:115: error: cannot find symbol
+	private MatFileIncrementalWriter matFileWriter;
+	        ^
+  symbol:   class MatFileIncrementalWriter
+  location: class FBAWorld
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\edu\bu\segrelab\comets\fba\FBAWorld.java:52: error: package com.jmatio.io does not exist
+import com.jmatio.io.*;
+^
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\edu\bu\segrelab\comets\fba\FBAWorld.java:53: error: package com.jmatio.types does not exist
+import com.jmatio.types.*;
+^
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\edu\bu\segrelab\comets\fba\FBAOptimizerGLPK.java:4: error: package org.gnu.glpk does not exist
+import org.gnu.glpk.GLPK;
+                   ^
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\edu\bu\segrelab\comets\fba\FBAOptimizerGLPK.java:5: error: package org.gnu.glpk does not exist
+import org.gnu.glpk.GLPKConstants;
+                   ^
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\edu\bu\segrelab\comets\fba\FBAOptimizerGLPK.java:6: error: package org.gnu.glpk does not exist
+import org.gnu.glpk.SWIGTYPE_p_double;
+                   ^
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\edu\bu\segrelab\comets\fba\FBAOptimizerGLPK.java:7: error: package org.gnu.glpk does not exist
+import org.gnu.glpk.SWIGTYPE_p_int;
+                   ^
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\edu\bu\segrelab\comets\fba\FBAOptimizerGLPK.java:8: error: package org.gnu.glpk does not exist
+import org.gnu.glpk.glp_iptcp;
+                   ^
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\edu\bu\segrelab\comets\fba\FBAOptimizerGLPK.java:9: error: package org.gnu.glpk does not exist
+import org.gnu.glpk.glp_prob;
+                   ^
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\edu\bu\segrelab\comets\fba\FBAOptimizerGLPK.java:10: error: package org.gnu.glpk does not exist
+import org.gnu.glpk.glp_smcp;
+                   ^
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\edu\bu\segrelab\comets\fba\FBAOptimizerGLPK.java:71: error: cannot find symbol
+	private glp_prob lp;	// standard fba lp model
+	        ^
+  symbol:   class glp_prob
+  location: class FBAOptimizerGLPK
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\edu\bu\segrelab\comets\fba\FBAOptimizerGLPK.java:72: error: cannot find symbol
+	private glp_prob lpMSA; // fba lp model that also minimizes the sum of absolute values 
+	        ^
+  symbol:   class glp_prob
+  location: class FBAOptimizerGLPK
+C:\Users\hgh97\comets_home\COMETS\comets_simplified\src\
+
+Compilation FAILED. Cannot run demo with compiled COMETS.
+The compilation errors indicate missing or incompatible dependencies.
+
+Attempting to use the 2.10.0 JAR with Gurobi workaround...

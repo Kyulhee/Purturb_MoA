@@ -1,0 +1,28 @@
+============================================================
+Compile COMETS 2.12.4 from Source with UTF-8 Encoding
+============================================================
+
+--- Step 1: Fix encoding issues ---
+
+--- Step 2: Build classpath ---
+Classpath: 26 JARs
+
+--- Step 3: Compile Java source ---
+Found 56 Java source files
+Compiling 56 files with -encoding UTF-8...
+Compile return code: 2
+stderr (103 chars):
+error: error reading C:\Users\hgh97\comets_2.12.4\lib\jdistlib-0.4.5-bin.jar; zip END header not found
+
+
+Compilation FAILED. Checking specific errors...
+
+Files with errors: 0
+
+Attempting compilation without problematic files...
+Partial compile return code: 2
+stderr: error: error reading C:\Users\hgh97\comets_2.12.4\lib\jdistlib-0.4.5-bin.jar; zip END header not found
+
+
+--- Step 6: Update comets_scr.bat ---
+Updated C:\Users\hgh97\comets_2.12.4\comets_scr.bat

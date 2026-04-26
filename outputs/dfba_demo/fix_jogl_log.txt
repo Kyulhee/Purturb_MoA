@@ -1,0 +1,61 @@
+============================================================
+Fix JOGL and jdistlib, then run dFBA demo
+============================================================
+
+--- Downloading JOGL/JOGAMP ---
+  [DL] jogl-all.jar from org/jogamp/jogl/jogl-all/2.4.0-rc-20220328/jogl-all-2.4.0-rc-20220328.jar... failed
+  [DL] jogl-all.jar from org/jogamp/jogl/jogl-all/2.4.0/jogl-all-2.4.0.jar... failed
+  [DL] jogl-all.jar from org/jogamp/jogl/jogl-all/2.3.2/jogl-all-2.3.2.jar... OK (3414448 bytes)
+  [DL] jogl-all-natives-windows-amd64.jar from org/jogamp/jogl/jogl-all/2.4.0-rc-20220328/jogl-all-2.4.0-rc-20220328-natives-windows-amd64.jar... failed
+  [DL] jogl-all-natives-windows-amd64.jar from org/jogamp/jogl/jogl-all/2.3.2/jogl-all-2.3.2-natives-windows-amd64.jar... OK (240721 bytes)
+  [DL] jogl-all-natives-linux-amd64.jar from org/jogamp/jogl/jogl-all/2.4.0-rc-20220328/jogl-all-2.4.0-rc-20220328-natives-linux-amd64.jar... failed
+  [DL] jogl-all-natives-linux-amd64.jar from org/jogamp/jogl/jogl-all/2.3.2/jogl-all-2.3.2-natives-linux-amd64.jar... OK (224010 bytes)
+  [DL] gluegen-rt.jar from org/jogamp/gluegen/gluegen-rt/2.4.0-rc-20220328/gluegen-rt-2.4.0-rc-20220328.jar... failed
+  [DL] gluegen-rt.jar from org/jogamp/gluegen/gluegen-rt/2.3.2/gluegen-rt-2.3.2.jar... OK (345605 bytes)
+  [DL] gluegen-rt-natives-windows-amd64.jar from org/jogamp/gluegen/gluegen-rt/2.4.0-rc-20220328/gluegen-rt-2.4.0-rc-20220328-natives-windows-amd64.jar... failed
+  [DL] gluegen-rt-natives-windows-amd64.jar from org/jogamp/gluegen/gluegen-rt/2.3.2/gluegen-rt-2.3.2-natives-windows-amd64.jar... OK (8159 bytes)
+  [DL] gluegen-rt-natives-linux-amd64.jar from org/jogamp/gluegen/gluegen-rt/2.4.0-rc-20220328/gluegen-rt-2.4.0-rc-20220328-natives-linux-amd64.jar... failed
+  [DL] gluegen-rt-natives-linux-amd64.jar from org/jogamp/gluegen/gluegen-rt/2.3.2/gluegen-rt-2.3.2-natives-linux-amd64.jar... OK (4149 bytes)
+  [DL] gluegen.jar from org/jogamp/gluegen/gluegen/2.4.0-rc-20220328/gluegen-2.4.0-rc-20220328.jar... failed
+  [DL] gluegen.jar from org/jogamp/gluegen/gluegen/2.3.2/gluegen-2.3.2.jar... OK (865121 bytes)
+
+--- Fixing jdistlib ---
+  jdistlib: STILL MISSING
+
+--- JOGL verification ---
+  gluegen-rt-natives-linux-amd64.jar: 4149 bytes
+  gluegen-rt-natives-windows-amd64.jar: 8159 bytes
+  gluegen-rt.jar: 345605 bytes
+  gluegen.jar: 865121 bytes
+  jogl-all-natives-linux-amd64.jar: 224010 bytes
+  jogl-all-natives-windows-amd64.jar: 240721 bytes
+  jogl-all.jar: 3414448 bytes
+
+============================================================
+Running dFBA Demo
+============================================================
+cometspy and cobra loaded
+E. coli model: e_coli_core, 95 reactions
+
+Creating simulation object...
+GUROBI_HOME not found. Skipping Gurobi import.
+IndexError: list index out of range
+Traceback (most recent call last):
+  File "C:\test\llm_project\nexus-science-win\outputs\dfba_demo\06_fix_jogl.py", line 199, in <module>
+    sim = c.comets(lay, p)
+  File "C:\Users\hgh97\miniconda3\Lib\site-packages\cometspy\comets.py", line 150, in __init__
+    self.__build_default_classpath_pieces()
+    ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^^
+  File "C:\Users\hgh97\miniconda3\Lib\site-packages\cometspy\comets.py", line 246, in __build_default_classpath_pieces
+    self.classpath_pieces['jdistlib'] = glob.glob(self.COMETS_HOME +
+                                        ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                                  '/lib' + '/**/*jdistlib*',
+                                                  ~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                                  recursive=True)[0]
+                                                  ~~~~~~~~~~~~~~~^^^
+IndexError: list index out of range
+
+Some classpath JARs are still missing.
+Attempting to bypass by manually setting classpath...
+
+Attempting alternative: direct Java execution...

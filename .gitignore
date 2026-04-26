@@ -56,3 +56,4 @@ crash.log
 outputs/**/*.csv
 outputs/**/*.tsv
 outputs/**/*.json
+*.zip
