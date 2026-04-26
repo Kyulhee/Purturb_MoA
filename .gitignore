@@ -1,24 +1,58 @@
-# Never commit real API keys or local .env
+# === Purturb_MoA 프로젝트 ===
+# 결과물 위주로 공개, 인프라/바이너리/시크릿 제외
+
+# --- Secrets ---
 .env
 .env.local
 .env.*.local
+.env.example
 
-# Binaries are distributed via GitHub Releases, not committed into the
-# repo itself. A rogue local copy would exceed the 100 MB file limit
-# on push. The release workflow uploads bin/nexus-science.exe with
-# `gh release create` instead.
+# --- Nexus Science 인프라 (미공개) ---
+CHANGELOG.md
+bin/
+
+# --- Binaries (bionexus 인프라) ---
 bin/
 *.exe
+*.dll
 
-# OS cruft
+# --- Model weights / data binaries ---
+*.pt
+*.pth
+*.pkl
+*.h5
+*.h5ad
+*.tar
+*.tar.gz
+*.parquet
+*.npy
+*.npz
+
+# --- Python cache ---
+__pycache__/
+*.pyc
+*.pyo
+
+# --- Agent/infra internals ---
+.claude/
+.nexus/
+
+# --- OS cruft ---
 .DS_Store
 Thumbs.db
+desktop.ini
 
-# Editor artifacts
+# --- Editor artifacts ---
 .vscode/
 .idea/
 *.swp
+*.swo
 
-# Crash logs from user reports
+# --- Crash logs ---
 crash.log
 *.crash
+
+# --- Large data files ---
+outputs/**/*.csv
+outputs/**/*.tsv
+outputs/**/*.json
