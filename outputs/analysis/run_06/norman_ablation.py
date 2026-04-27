@@ -232,8 +232,11 @@ def train_model(encoder, decoder, X_train, pert_ids, ct_ids, n_cell_types,
                         z_tx_2 = z_tx_m[mask_p2].mean(0)
 
                         # Get z_x from a random cell (covariate)
-                        z_x_ref = z_x_m[mask_p1[:1].nonzero().squeeze()[:1]]
-                        z_t_ref = z_t_m[mask_p1[:1].nonzero().squeeze()[:1]]
+                        idx_p1 = mask_p1.nonzero(as_tuple=True)[0][:1]
+                        if idx_p1.shape[0] == 0:
+                            continue
+                        z_x_ref = z_x_m[idx_p1].squeeze(0).unsqueeze(0)
+                        z_t_ref = z_t_m[idx_p1].squeeze(0).unsqueeze(0)
 
                         # Compose z_tx (try additive — most common in real data)
                         z_tx_composed = z_tx_1 + z_tx_2
