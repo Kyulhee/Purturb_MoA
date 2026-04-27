@@ -16,43 +16,64 @@
 
 ## 검증된 핵심 지식
 
+### H1 인과 불변성 가설 — 실험 결과 (run_04-05)
+
+**RQ1: ICM이 z_tx를 cell type 불변으로 만드는가** — 합성 통과
+- FCR (ICM 없음): 교세포 상관계수 0.505
+- FCR + ICM: 교세포 상관계수 0.971
+- ICM MMD 정규화가 10개 교란 모두에서 개선 (범위: +0.21 ~ +0.74)
+
+**RQ2: 단일-KO z_tx로 조합적 예측 가능한가** — 합성(잠재공간) 실패, 합성(유전자공간) 통과, 실제 통과
+- 합성 잠재공간: best_corr=0.29, best_R2=-1.63 — 인코더 비선형 변환으로 조합 구조 파괴
+- 합성 유전자공간: **R2=0.88, corr=0.94** — 디코더가 인코더 비선형성 보상 (run_05로 검증)
+- Norman 2019 실제: FCR best_corr=0.955, best_R2=0.881 / FCR+ICM best_corr=0.951, best_R2=0.870
+- **소거실험(run_05)**: 조합 일관성 손실이 RQ2-cross 0.20→0.79 개선. 전체 모델(config 6) RQ1=0.99, RQ3=0.99
+
+**RQ3: ICM이 zero-shot 교세포 전이를 가능하게 하는가** — 합성 통과
+- FCR (ICM 없음): 전이 상관계수 0.508, 코사인 0.476
+- FCR + ICM: 전이 상관계수 0.960, 코사인 0.956
+
+**Replogle 2022**: K562 단일 세포유형만 확보 → RQ1/RQ3 다세포유형 검증 불가
+
+### 핵심 인사이트
+1. **ICM은 불변성에 확실히 유효** (RQ1, RQ3). MMD 정규화가 z_tx 교세포 정렬에 강력
+2. **RQ2 합성-실제 갭 해명됨**: 조합성은 유전자 공간에서 평가해야 함. 잠재 공간 R2=0.05 vs 유전자 공간 R2=0.88. 디코더가 인코더 비선형성 보상
+3. **조합 일관성 손실이 핵심 구성요소**: ICM만으로 RQ2 개선 안 됨. comp_loss가 RQ2-cross를 0.20→0.79로 향상
+4. **ICM이 인코더를 더 선형적으로 만듦**: linear R2 0.69→0.87. ICM의 분포 정렬이 부차적으로 조합 구조 보존에 기여
+5. **다세포유형 데이터 필요**: Replogle은 RPE1 데이터 로딩 실패. RQ1/RQ3 실제데이터 검증에 추가 데이터셋 필요
+
 ### 이전 방향(NAP)에서 검증된 지식 (참고용)
-- **XGBoost-only R2=0.91** (textbook, 137차원 knockout mask) — FBA는 근본적으로 tabular problem
-- **NAP 가치 조건**: textbook 0/6, multi-species 2/6, FlowGAT-style 2/6 — novelty 부족으로 방향 전환
-- **AL 실패**: input-space AL R2=0.69 vs random R2=0.81 — ensemble uncertainty가 FBA surrogate에 부적합
-- **dFBA 안정성**: BDF 정확, Euler 사용 금지 — 후속 연구 참고
-- **GPU 벤치마크**: textbook CPU 우세, iJO1366 GPU 1.3x — 소규모 그래프는 CPU 효율
-
-### Perturb-seq 미해결 문제 (run_04에서 검증)
-- **Problem 1**: 평가 지표 붕괴 — Islander(MLP)가 SOTA 능가하나 생물학 왜곡 (Wang et al., 2026)
-- **Problem 2**: 조합 폭발 — 단일 섭동만으로 조합 예측하는 방법 없음
-- **Problem 3**: 교차 세포 유형 전이 — GEARS 명시적 미지원, Cell-JEPA 효과 크기 불가
-- **Problem 4**: 근본적 난이도 이론 부재 — 정보이론적 가변성 한계 없음
-- **Problem 5**: 측정-필요 불일치 — immortalized KO vs primary drug response
-
-### 교차 도메인 탐색 결과 (run_04에서 검증)
-- OT 도메인: 포화 — avoid
-- MapPFN(arXiv:2601.21092): 인컨텍스트 학습으로 제로샷 가능, 2026년 1월 — 최신
-- FCR+ICM 결합: 미탐색, 참신성 VERY HIGH
-- 조합 일반화: 원칙적 프레임워크 부재, 참신성 VERY HIGH
+- **XGBoost-only R2=0.91** — FBA는 근본적으로 tabular problem
+- **GNN 임베딩 중복**: 정적 그래프에서는 knockout mask가 충분 통계량
+- **AL 실패**: FBA가 싸고 입력 차원이 낮아 AL 이점 없음
 
 ---
 
-## 다음 단계
+## 현재 진행 상태
 
-1. ~~Step 0-3: 기존 분석(NAP) 재현~~ 완료 (novelty 부족으로 방향 전환)
-2. **Step 1**: 데이터 확보 및 전처리 (Norman 2019, Replogle 2022)
-3. **Step 2**: FCR 인코더 구현 + z_x/z_t/z_tx 분해 검증
-4. **Step 3**: ICM 정규화 구현 + z_tx 불변성 검증 (RQ1)
-5. **Step 4**: 경로 모듈 분해 + 조합 함수 구현 (RQ2)
-6. **Step 5**: 교차 세포 유형 제로샷 전이 실험 (RQ3)
-7. **Step 6**: 소거 실험 매트릭스 (6개 구성)
-8. **Step 7**: 결과 분석 + 논문 초안
+| 단계 | 상태 | 비고 |
+|------|------|------|
+| Step 1: 데이터 확보 | 완료 | Norman 2019 (89K cells), Replogle K562 (162K cells) |
+| Step 2: FCR 인코더 구현 | Phase 1 완료 | VAE, z_dim=8, z_x/z_t/z_tx 분해 |
+| Step 3: ICM 정규화 (RQ1) | 합성 통과 | 교세포 corr 0.505→0.971 |
+| Step 4: 조합성 (RQ2) | 합성 실패, 실제 통과 | Norman best_corr=0.955, best_R2=0.881 |
+| Step 5: 교세포 전이 (RQ3) | 합성 통과 | 교세포 corr 0.508→0.960 |
+| Step 6: 소거 실험 | 완료 (run_05) | 6구성 소거 + 인코더 비선형성 + 갭 해명 |
+| Step 7: 논문 초안 | 미실행 | |
+
+## 미해결 과제
+
+1. **RQ1/RQ3 실제데이터 검증**: 다세포유형 Perturb-seq 데이터셋 필요 (Replogle RPE1 로딩 실패)
+2. ~~**RQ2 합성-실제 갭 해명**~~: run_05에서 해명 — 유전자 공간 평가로 전환 시 디코더 보상으로 R2=0.88 달성
+3. ~~**소거 실험**~~: run_05 완료 — ICM 핵심, comp_loss 필수, linear head 선택적
+4. **실제데이터 소거실험**: Norman 데이터에서 config 5/6 검증
+5. **논문 초안 작성**: Stage 05로 이관
 
 ---
 
 ## Run 이력 (세부 내용은 outputs/analysis/run_XX/ 참조)
-- **run_01** (2026-04-26): Module A/B/C 구현 + E2E 파이프라인. XGBoost R2=0.91, NAP 가치 조건 매핑, dFBA 안정성, GPU 벤치마크
-- **run_02** (2026-04-27): 문헌 심층 리뷰 11편. FlowGAT, scFEA, SARTRE, Xu 2019, homophily
-- **run_03** (2026-04-27): Input-space AL 실험. AL R2=0.69 vs Random R2=0.81 — AL 실패
-- **run_04** (2026-04-27): NAP transfer v2 실험(불완전) + Perturb-seq 미해결 문제 43편 리뷰 + 교차 도메인 10개 스캔 → 방향 전환 계기
+- **run_01** (2026-04-26): NAP E2E 파이프라인. XGBoost R2=0.91, GNN 중복성 확인
+- **run_02** (2026-04-27): GNN vs tabular 문헌 심층 리뷰 11편
+- **run_03** (2026-04-27): Input-space AL 실험. AL R2=0.56 vs Random R2=0.68 — AL 실패
+- **run_04** (2026-04-27): Perturb-seq 미해결 문제 리뷰 + 교차 도메인 10개 스캔 → 방향 전환 + Phase 1 합성검증(RQ1/RQ3 통과, RQ2 실패) + Phase 2 Norman 실제데이터(RQ2 통과: best_corr=0.955, best_R2=0.881) + Replogle RPE1 로딩 실패
+- **run_05** (2026-04-27): 소거실험(6구성) + 인코더 비선형성 측정 + RQ2 갭 해명(잠재공간 R2=0.05 vs 유전자공간 R2=0.88)

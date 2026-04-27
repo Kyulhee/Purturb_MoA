@@ -30,6 +30,12 @@
 - **Run 이력은 맨 아래 3-5줄**: 세부 내용은 outputs/ 참조
 - **stages/에는 설계 결정과 그 근거만 기록**. 환경/인프라 정보, 도구 목록, 상세 코드/로그는 outputs/에 보관
 
+## 실험 보고서 (사용자 요청 시)
+- 가설 실패/방향 전환 시 사용자가 보고서 작성을 요청하면 `docs/07_experiment_failure_reports.md` 가이드에 따라 작성
+- 저장 위치: `outputs/analysis/experiment_reports/`
+- 번호 규칙: `{순번}_{키워드}.md` (한글판은 `_kr.md`)
+- stages/에는 반영하지 않음
+
 ## 작업 시작/종료 시 참조
 - **Run 시작 시**: `docs/04_analysis.md` 리소스 체크 수행
 - **Run 종료 시**: `docs/06_git_policy.md` 커밋/푸시 규칙 준수
