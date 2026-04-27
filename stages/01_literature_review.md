@@ -35,6 +35,13 @@ Perturb-seq(단일 세포 해상도 섭동 프로파일링)는 20+ 신규 방법
 | CellOT (Mittal et al., 2023) | 신경 OT | — | 교차 환자만 | Nature Methods |
 | CFM-GP (arXiv:2508.08312) | 교차 세포 유형 flow | — | 단일 모델 | 인과 분해 없음 |
 | C3TL (arXiv:2603.13051) | 인과 맥락 전이 | — | FM과 경쟁적 | bulk 데이터 활용 |
+| **BuDDI** (Davidson et al., 2023, bioRxiv) | VAE 4-분해 + 도메인 불변성 | 분해된 잠재 조합 | 도메인 적응 | FCR-ICM과 원리 유사 |
+| **scDRP** (Sun, Stojanov, Zhang, 2025, bioRxiv) | β-VAE 분해 + 인과 최적수송 | 조합 일반화 | 인과성 기반 | Kun Zhang(인과전문가) 참여 |
+| **XTransferCDR** (Liu & Jin, 2024, arXiv:2412.19228) | 도메인 분리 인코더 + 교차 전이 | 교란 표현 교차 전이 | 교차 도메인 | 약물+유전자 섭동 |
+| **Latent Causal Diffusions** (Lorch et al., 2026, arXiv:2601.15341) | 인과 확산 + 잠재 분해 | — | — | "simple baselines 약함" 직접 언급 |
+| **STRAND** (Fu et al., 2026, arXiv:2602.10156) | 서열 조건부 수송 | — | K562/Jurkat/RPE1 | DNA 서열 조건부 |
+| **Departures** (Chi et al., 2025, arXiv:2511.13124) | Schrödinger bridge | — | — | 분포 수송 |
+| **CRADLE-VAE** (Baek et al., 2024, arXiv:2409.05484) | 역사실 추론 + artifact 분리 | — | — | artifact 분리에 초점 |
 
 ### 인과 표현 학습 (교차 도메인)
 | 방법 | 핵심 기여 | 비고 |

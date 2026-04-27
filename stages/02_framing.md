@@ -1,6 +1,8 @@
 # Stage 02 — Framing
 
 ## Loopback 기록
+- **2026-04-28**: Analysis → Literature Review 루프백. run_08 기준선 비교에서 Mean Shift R2=0.82, FCR+ICM R2=0.92 (+0.10만 우위)로 교세포 전이 novelty 불충분 판정. 문헌에서 누락된 직접 경쟁자 5개(BuDDI, C3TL, scDRP, XTransferCDR, CPA) 발견. FCR-ICM의 핵심 아이디어(VEA 분해+도메인 불변성+교세포 전이)가 이미 포화 상태. docs/01, docs/02에 신규성 세이프가드 추가 완료.
+- **2026-04-27**: Analysis → Framing 루프백. 기존 NAP 프레임워크의 novelty 부족으로 연구 질문 전면 재설계. 대사 네트워크 surrogate → Perturb-seq cross-cell-type combinatorial prediction으로 도메인 전환. 가설 선택 과정은 `outputs/analysis/run_04/cross_domain_novelty_scan.md` 참조.
 - **2026-04-27**: Analysis → Framing 루프백. 기존 NAP 프레임워크의 novelty 부족으로 연구 질문 전면 재설계. 대사 네트워크 surrogate → Perturb-seq cross-cell-type combinatorial prediction으로 도메인 전환. 가설 선택 과정은 `outputs/analysis/run_04/cross_domain_novelty_scan.md` 참조.
 
 ## Workflow
