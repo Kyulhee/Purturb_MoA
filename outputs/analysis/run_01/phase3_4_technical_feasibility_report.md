@@ -255,10 +255,21 @@
 **하드웨어 환경:**
 | 환경 | PyTorch | CUDA | GPU | 비고 |
 |------|---------|------|-----|------|
-| base (현재) | 2.11.0+cpu | 없음 | — | cobra, PyG, xgboost 설치됨 |
-| ai_env | 2.5.1 | 12.4 | RTX 4060 Ti (8GB) | cobra, PyG, xgboost 미설치 |
+| base | 2.11.0+cpu | 없음 | — | cobra, PyG, xgboost 설치됨 |
+| **ai_env (권장)** | 2.5.1 | 12.4 | RTX 4060 Ti (8GB VRAM, Compute 8.9) | cobra 0.31.1, PyG 2.7.0, xgb 3.2.0, pymoo 0.6.1.6 전부 설치 완료 |
 
-**권장**: base 환경에서 CPU 작업 수행. GNN GPU 가속 필요 시 ai_env에 패키지 추가 설치.
+**GPU 벤치마크 결과 (2026-04-27 실측):**
+
+| 모델 | GPU (ms/call) | CPU (ms/call) | GPU speedup | VRAM |
+|------|--------------|--------------|-------------|------|
+| textbook (72+95+137 nodes) | 7.77 | 3.75 | 0.5x | 10.6 MB |
+| **iJO1366 (1774+2583+1367 nodes)** | **7.71** | **10.16** | **1.3x** | **74.9 MB** |
+
+- textbook 규모: CPU가 빠름 (GPU 커널 런칭 오버헤드 > 연산 이득)
+- iJO1366 규모: GPU가 1.3x 빠름 (노드 수 증가로 GPU 병렬성 활용)
+- iJO1366 전체 학습 추정 (100 epochs, 5000 samples): GPU ~128min vs CPU ~169min
+
+**권장**: ai_env 환경에서 전체 작업 수행. textbook은 CPU로 충분하나, iJO1366은 GPU 권장.
 
 ---
 

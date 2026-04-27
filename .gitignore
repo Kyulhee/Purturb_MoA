@@ -57,3 +57,4 @@ outputs/**/*.csv
 outputs/**/*.tsv
 outputs/**/*.json
 *.zip
+*.gz

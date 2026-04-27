@@ -17,42 +17,71 @@
 
 ## 1. 연구 배경
 
-대사 네트워크 최적화에서 설계 공간(gene knockout 조합)은 조합 폭발에 직면함. E. coli textbook 모델만 137개 유전자로 double knockout 9,316, triple knockout ~630K 조합. 실제 산업 균주(iJO1366, 1,367 genes)에서는 double knockout만 ~934K. 기존 FBA(flux balance analysis)는 각 조합을 선형계획법으로 풀어야 하므로, 전수 조사는 계산적으로 불가능.
+Perturb-seq(단일 세포 해상도 섭동 프로파일링)는 20+ 신규 방법(2025-2026)에도 불구하고 두 가지 근본적 미해결 문제에 직면: (1) 조합 섭동 예측 — 단일 섭동 데이터만으로 조합 효과를 예측하는 원칙적 프레임워크 부재, (2) 교차 세포 유형 전이 — 소스 세포 유형에서 학습한 모델이 타겟 세포 유형에서 작동하지 않음.
+
+핵심 질문: **섭동 효과를 인과적이고 불변하는 모듈로 분해하면, 이 모듈의 조합이 타겟 세포 유형의 데이터 없이 조합 섭동 효과를 제로샷으로 예측할 수 있는가?**
 
 ## 2. SOTA
 
-| 영역 | 방법 | 성능 | 비고 |
-|------|------|------|------|
-| 섭동 예측 (참고) | PerturbNet | R2=0.984 (sci-Plex) | GNN 기반 surrogate의 상한 참고치. 화합물-섭동 예측이며 대사 네트워크 직접 적용은 아님 |
-| 대리 모델 (화학) | GNN+BO | 분자 최적화에서 5-10x 효율 | GNN 임베딩 + Bayesian Optimization. 대사 네트워크에 적용된 사례 없음 |
-| dFBA 시뮬레이션 | COMETS v2.12.4 | 공간+dFBA 통합 | Java 기반, Python 래퍼(cometspy). stiff ODE 처리 검증 |
-| 다목적 최적화 | NSGA-II (pymoo) | Pareto front 30해 도출 확인 | 단일 목적 대비 trade-off 가시화. 대사 네트워크 적용 사례 부재 |
-| 의사결정 | TOPSIS Expert(0.7/0.3) | Kendall tau=0.73, top3=100% | 가중치 섭동 대비 가장 안정. Entropy(tau=0.41)는 보조 |
+### 섭동 예측 방법
+| 방법 | 접근 | 조합 예측 | 교차 세포 유형 | 비고 |
+|------|------|----------|--------------|------|
+| GEARS (Roohani et al., 2023) | GNN + GRN | 조합 학습 데이터 필수 | 명시적 미지원 | Nature Biotech |
+| CPA (Lotfollahi et al., 2023) | 조합 오토인코더 | OOD 시 DEG 0.85→0.38 | 제한적 | Mol Syst Biol |
+| SAMS-VAE (arXiv:2311.02794) | 희소 가법 메커니즘 | 가법 분해 한계 | — | 상잔 작용 불가 |
+| scDFM (arXiv:2602.07103) | 분포적 flow matching | 19.6% MSE 감소 | — | ICLR 2026 |
+| scBIG (arXiv:2602.04901) | 모듈 유도 표현 | 6.7% 개선 | — | 조합 규칙 없음 |
+| MapPFN (arXiv:2601.21092) | 인컨텍스트 학습 | 제로샷 가능 | — | 명시적 조합 구조 없음 |
+| CellOT (Mittal et al., 2023) | 신경 OT | — | 교차 환자만 | Nature Methods |
+| CFM-GP (arXiv:2508.08312) | 교차 세포 유형 flow | — | 단일 모델 | 인과 분해 없음 |
+| C3TL (arXiv:2603.13051) | 인과 맥락 전이 | — | FM과 경쟁적 | bulk 데이터 활용 |
 
-## 3. 베이스라인
+### 인과 표현 학습 (교차 도메인)
+| 방법 | 핵심 기여 | 비고 |
+|------|----------|------|
+| FCR (arXiv:2410.22472) | z_x/z_t/z_tx 분해 + 식별 가능성 증명 | 본 제안의 기반 |
+| IEM (arXiv:2406.14302) | 교환 가능 메커니즘 + 완화된 식별 조건 | Schölkopf group, ICLR 2025 |
+| Uhler & Zhang (arXiv:2511.04790) | 인과 구조 + 표현 학습 3-문제 프레임워크 | ICM 2026 survey |
+| Rajendran et al. (arXiv:2402.09236) | 인과 → 개념 기반 표현 학습 통합 | Schölkopf group, NeurIPS 2024 |
 
-| 방법 | 성능 | 재현 가능성 |
-|------|------|------------|
-| Random screening | FBA 전수 호출 | 기본 baseline. 100ms/call, double knockout 9,316조합 = ~15min |
-| XGBoost-only (raw features) | R2=-0.31, RMSE=0.35 | knockout_mask만으로는 불가. GNN 임베딩 필요성 시사 |
-| GNN-only (linear head) | R2=-0.11 | 135샘플+169차원으로 일반화 불가. 샘플 증가 시 개선 기대 |
-| Euler dFBA | 5.7x 과대추정 | 사용 금소. BDF/Radau 필수 |
-| COBRApy 직접 FBA | 100ms/call (textbook), 200-500ms (iJO1366) | multiprocessing으로 8-core 시 ~8x 가속 |
+### 평가 지표
+| 지표 | 한계 | 비고 |
+|------|------|------|
+| MSE/R2 | 분포 형태 무시 | 표준 |
+| DEG overlap | 이진 임계값으로 정보 손실 | CPA 평가 |
+| PDS | 거리 지표 선택에 민감 | ARC Virtual Cell Challenge |
+| Shesha (arXiv:2604.16642) | 크기 + 방향 일관성 분리 | 보완적 지표 |
+| scGraph (Wang et al., 2026) | 생물학적 구조 보존 평가 | Islander 문제 해결 |
+
+## 3. 이론적 기반
+
+### FCR 분해 (본 제안의 핵심)
+- z_x: 세포 특이 공변량 (세포 유형, 세포 주기 등)
+- z_t: 처리 식별자 (어떤 유전자가 KO되었는가)
+- z_tx: 상호작용 효과 (처리가 이 세포에 미치는 효과)
+- 식별 가능성: block-wise identifiability (강한 가정이나 약화된 버전 존재)
+
+### ICM 원리 (Schölkopf group)
+- 인과 메커니즘은 맥락에 독립적(자율적)
+- z_tx가 진짜 인과적이면 세포 유형에 불변해야 함
+- 이론적 근거: IEM (arXiv:2406.14302)에서 교환 가능 메커니즘으로 형식화
+
+### 조합 일반화 (미해결)
+- 생물학은 종종 비조합적(상위성, 완충, 합성 치사)
+- Norman et al. (2019): CBL/CNN1 시너지 = 개별 효과로 예측 불가
+- 부분적 조합 구조: 독립 경로는 가법적, 동일 경로는 비가법적
+- scBIG: 유전자 프로그램 구조가 도움 (6.7%), 조합 규칙은 미제공
 
 ## 4. Gap (Framing으로 전달)
 
-1. **GNN 대리 모델 실증 부재**: 화학/약물 분야에서 GNN surrogate는 R2>0.9 달성하나, 대사 네트워크의 이종 그래프(metabolite/reaction/gene)에 적용된 사례 없음. 현재 135샘플로 R2=-0.31, 500+샘플 + pretraining 개선 필요
-2. **AL 탐색 효율 실증 부재**: Active Learning으로 FBA 호출 수를 70-90% 감소시킬 수 있다는 가설은 타당하나, R2<0에서 uncertainty 기반 AL이 무효(diversity만 유효)라는 점이 실증적으로 확인됨. R2>0.3 이후 UCB 전환 로직 미검증
-3. **dFBA+다목적 최적화 통합 부재**: dFBA 수치 안정성(BDF/Radau)과 NSGA-II는 각각 검증되었으나, 두 시스템을 통합한 end-to-end 파이프라인의 계산비용(4-20h)과 수렴 보장은 미해결
-4. **의사결정 객관화**: FLYCOP(저장소 삭제)의 fuzzy logic 역할을 TOPSIS+Entropy로 대체 가능하나, Expert 가중치의 주관성 문제는 잔존
-
----
-
-## 이전 연구 이력
-- Perturb-seq MoA: 대조 학습 기반 약물 임베딩으로 MoA 클러스터링 개선 시도. 3중 실패(Loss 불균형/encoder 동결/평가오류)로 종료. 교훈은 Gap 1-2의 설계 원칙으로 반영 (multi-objective loss 분리, fine-tuning 허용, 평가지표-태스크 일치)
+1. **인과 불변성 × 조합성의 교차점 공백**: FCR은 분해된 표현 제공하나 교차 세포 유형 전이나 조합 예측에 적용하지 않음. ICM은 이론 원리이나 섭동 예측 정규화로 사용된 적 없음. 두 아이디어의 결합은 미탐색
+2. **조합 규칙의 부재**: scBIG은 모듈 구조를 보이고, MapPFN은 제로샷을 보이나, 둘 다 명시적 조합 규칙이 없음. 어떤 조합 연산(가법/곱법/학습)이 어떤 조건에서 작동하는지 특성화된 적 없음
+3. **교차 세포 유형 제로샷의 인과적 기반 부재**: CFM-GP, C3TL은 경험적 전이를 보이나 인과적 보장이 없음. ICM 불변성은 이론적 보장을 제공할 수 있음
 
 ---
 
 ## Run 이력 (세부 내용은 outputs/literature_review/run_XX/ 참조)
-- run_01: LLM 바이오인포마틱스 10편 + Perturb-seq MoA 6모델. 갭 식별 성공, MoA 베이스라인/대조학습/데이터 미검증
-- run_02: 대조학습 2편 + 섭동예측 3편 + MoA분류 3편 리뷰. 베이스라인/이론/데이터 기본 확보
+- run_01: LLM 바이오인포마틱스 10편 + 섭동 예측 6모델 리뷰
+- run_02: 대조학습/섭동예측/MoA분류 11편 리뷰
+- run_03: GNN vs tabular 14편 심층 리뷰
+- run_04 (outputs/analysis/run_04/): Perturb-seq 미해결 문제 43편 심층 리뷰 + 10개 교차 도메인 참신성 스캔
