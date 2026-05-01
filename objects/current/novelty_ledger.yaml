@@ -1,0 +1,134 @@
+object_type: NoveltyLedger
+status: active
+last_updated: "2026-04-30"
+linked_stage: framing
+linked_run: run_06
+
+target_contribution: "섭동 예측 평가 지표의 생물학적 충실도 측정 능력 진단 + BioEval 지표 설계 + 베이스라인 위기 해소 (지표-순위 반전 분석)"
+
+novelty_layers:
+  abstract_principle:
+    claim: "최적화 목표(평가 지표)가 모델 행동을 결정하므로, 잘못된 지표는 잘못된 모델 비교를 낳는다. 생물학적 충실도를 측정하는 지표를 설계하면, 현재 DL≤baseline 위기가 지표 아티팩트인지 실재하는지 판별할 수 있다"
+    novelty_level: "strong"
+    prior_art:
+      - "SCALE (2026): MSE가 mean-effect trap 유발 (지적만, 해결책 제안은 제한적)"
+      - "Ahlmann-Eltze (2025): DL≤baseline (진단만, 원인 분석 없음)"
+    interpretation: "Goodhart's law의 섭동 예측 적용. 지표가 최적화 목표이므로 지표가 틀리면 모델도 틀림. 이 원리 자체는 새롭지 않으나, 섭동 예측에서 지표-순위 반전을 정량적으로 분석하는 것은 신규"
+  domain_application:
+    claim: "Perturb-seq 섭동 예측에서 지표 선택이 모델 순위를 어떻게 바꾸는지, 어떤 지표가 downstream 생물학적 유용성을 예측하는지 분석"
+    novelty_level: "strong"
+    prior_art:
+      - "Wei et al. (2026) Nature Methods: 27방법×6지표 벤치마크 (지표 비교는 있으나 순위 반전 분석 없음)"
+      - "Zhu et al. (2025): R² vs AUPRC 불일치 (지표 불일치는 보여주나 순위 반전 분석 없음)"
+    interpretation: "Wei et al.과 Zhu et al.이 지표 간 불일치를 보여줬으나, '지표 교체가 모델 선택을 바꾸는가?'라는 질문은 누구도 묻지 않음. 이것이 핵심 차별화"
+  method_specificity:
+    claim: "BioEval-Dir(유전자×섭동 수준 방향 정확도) + BioEval-Cal(효과크기 보정) + 지표-downstream 과업 상관 분석"
+    novelty_level: "moderate"
+    prior_art:
+      - "Shesha (2026): 기하학적 안정성 (섭동 수준, 유전자 수준 아님)"
+      - "AUPRC/Zhu (2025): DEG precision-recall (방향/보정 없음)"
+      - "SCALE PDCorr: 섭동 방향 상관 (유전자 수준 분해 없음)"
+    interpretation: "개별 지표는 부분적 선행이 있으나, 유전자×섭동 수준 분해+방향+보정의 조합은 신규. 지표-downstream 상관 분석은 완전 신규"
+  integration_synergy:
+    claim: "지표 설계 → 순위 반전 분석 → downstream 과업 예측력의 인과 경로"
+    novelty_level: "moderate"
+    prior_art: []
+    required_evidence_for_synergy:
+      - "BioEval 순위가 MSE 순위와 다름 (Kendall τ < 0.7)"
+      - "BioEval 순위가 AL/hit prioritization 성과를 더 잘 예측"
+    interpretation: "지표→모델 선택→downstream 과업의 인과 경로 분석은 메타-평가로서 신규"
+
+contribution_decomposition:
+  components:
+    - component: "유전자×섭동 수준 방향 정확도 (BioEval-Dir)"
+      existing_prior_art:
+        - "Shesha: 섭동 수준 기하학적 안정성"
+        - "SCALE PDCorr: 섭동 방향 상관"
+      independently_novel: true
+      notes: "유전자×섭동 2D 분해능의 방향 정확도는 기존에 없음. 부호+크기 비율 결합"
+    - component: "효과크기 보정 분석 (BioEval-Cal)"
+      existing_prior_art: []
+      independently_novel: true
+      notes: "logFC 예측 vs 실제의 체계적 편향 탐지. 완전 신규 — 누구도 예측 과소/과대를 체계적 분석 안 함"
+    - component: "지표-순위 반전 정량화 (Kendall τ)"
+      existing_prior_art: []
+      independently_novel: true
+      notes: "MSE 순위 vs BioEval 순위 비교. 순위 변동이 체계적인지 분석. 완전 신규"
+    - component: "지표-downstream 과업 상관 분석"
+      existing_prior_art: []
+      independently_novel: true
+      notes: "지표 선택→AL 효율, hit prioritization 예측력. 완전 신규 — 메타-평가의 핵심"
+    - component: "DEG precision/recall 곡선 (BioEval-DEG)"
+      existing_prior_art:
+        - "Zhu et al. (2025) AUPRC"
+        - "SCALE DE overlap"
+      independently_novel: false
+      notes: "AUPRC와 겹침. 차이: 곡선 전체(단일 수치 아님) + 방향 결합. 독립 신규성 약함"
+    - component: "최소 보고 기준 제안"
+      existing_prior_art:
+        - "DOME (Walsh 2020): 일반 ML 검증 권고"
+      independently_novel: false
+      notes: "섭동 예측 특화는 신규이나, 일반 원리는 DOME에서 이미 제안"
+    - component: "베이스라인 위기 원인 판별"
+      existing_prior_art:
+        - "Ahlmann-Eltze (2025): 위기 진단"
+        - "Csendes (2025): FM≤mean 확인"
+      independently_novel: false
+      notes: "위기 존재는 이미 입증. 우리 기여는 원인이 지표인지 실재인지 판별하는 것"
+
+competitive_density:
+  direct_domain_competitors:
+    - "Wei et al. (2026) Nature Methods: 27방법 벤치마크. 기존 지표 사용, 새 지표 설계 없음, 순위 반전 분석 없음"
+    - "Zhu et al. (2025) Briefings Bioinformatics: AUPRC 지표. DEG 식별만, 방향/보정/downstream 상관 없음"
+    - "SCALE/Chen et al. (2026): Cell-Eval 프레임워크. PDCorr+DE overlap. 구현 민감성 문제, 이론적 분석 없음"
+    - "Shesha/Raju (2026): 기하학적 안정성. 단일 지표, 통합 프레임워크 없음"
+    - "Csendes et al. (2025) BMC Genomics: FM≤mean 벤치마크. 낮은 섭동 분산 확인, 지표 분석 없음"
+  adjacent_domain_competitors:
+    - "Ahlmann-Eltze et al. (2025) Nature Methods: DL≤baseline 진단. 해결책 제안 없음"
+    - "Roohani et al. (2025) Cell: Virtual Cell Challenge + PDS. 평가 표준화, 지표 설계 아님"
+  abstract_principle_prior_art:
+    - "Goodhart's law: 지표가 최적화되면 목표가 아님 (일반 원리)"
+    - "CASP (단백질 구조 예측 벤치마크): 지표 설계가 분야를 발전시킴 (유사 원리, 다른 도메인)"
+  direct_competitor_count: 5
+  density_decision: "moderate_competition — 차별화 명확히 필요"
+
+trivial_baseline_bound:
+  baseline_name: "MSE 기준 모델 순위 (Ahlmann-Eltze 벤치마크)"
+  expected_performance: "MSE 하에서 additive linear ≥ DL 모델 (Ahlmann-Eltze 입증)"
+  target_delta_required: "BioEval 하에서 DL > linear in ≥1 regime (synergistic GI, 교세포 등)"
+  rationale: "순위 반전(Kendall τ < 0.5)이 핵심 기준. 반전이 없어도 부정 결과로서 가치 있음"
+
+allowed_positioning:
+  disallowed_claims:
+    - "BioEval이 모든 면에서 MSE보다 우수하다"
+    - "DL 모델이 항상 baseline을 능가한다 (근거 없음)"
+    - "단일 지표로 모든 것을 평가할 수 있다"
+    - "기존 벤치마크(Wei et al.)가 무가치하다"
+  weak_claims:
+    - "BioEval-Dir이 MSE와 다른 모델을 선택한다 (증거 필요)"
+    - "BioEval이 AL 효율을 예측한다 (증거 필요)"
+  moderate_claims:
+    - "기존 지표(MSE/R²)와 생물학적 충실도 지표(AUPRC, BioEval) 간에 모델 순위 불일치가 존재한다"
+    - "지표 선택에 따라 모델 비교 결론이 달라질 수 있다"
+    - "BioEval-Dir과 BioEval-Cal이 MSE가 놓치는 예측 품질 측면을 포착한다"
+  strong_claims:
+    - "지표-순위 반전(Kendall τ)의 정량적 분석은 이전에 수행된 적이 없다"
+    - "지표-downstream 과업 상관 분석(지표→AL/hit prioritization 예측력)은 완전 신규이다"
+    - "DL≤baseline 위기가 지표 아티팩트인지 실재인지 판별하는 것은 미해결 문제이다"
+
+next_required_action: "Planning — BioEval 지표 구현, Ahlmann-Eltze 벤치마크 예측 확보/재현, 순위 반전 실험 설계"
+
+evidence:
+  - "Ahlmann-Eltze (2025) Nature Methods: DL ≤ linear baseline across 7+ benchmarks"
+  - "Zhu et al. (2025): R²와 AUPRC 간 유의미한 불일치. R² 높으나 DEG 식별 실패"
+  - "SCALE (2026): MSE가 mean-effect trap 유발. PDCorr+DE overlap 대안 제안"
+  - "Shesha (2026): magnitude와 stability가 0.75-0.97 상관하나 불일치 사례에서 생물학 노출"
+  - "우리 run_12: CPA>FCR (0.430 vs 0.367) + prod rho=0.437 PASS vs A7 rho=0.326 PARTIAL — 지표가 결론 변경"
+  - "Csendes (2025): 현재 Perturb-Seq 벤치마크의 낮은 섭동 특이 분산 — 벤치마크 자체의 문제"
+uncertainty:
+  - "Ahlmann-Eltze 벤치마크 예측 확보 가능 여부 (코드 공개 상태)"
+  - "지표-순위 반전이 실제로 일어날지 여부 (안 일어나도 발표 가능)"
+  - "BioEval 지표의 구현 민감성 (SCALE이 Cell-Eval에서 지적한 문제)"
+  - "Wei et al. (2026) 6개 지표 중 이미 순위 불일치가 있는지 (논문 확인 필요)"
+  - "생물학적 유용성의 operational definition 합의 여부"
+human_review_needed: true

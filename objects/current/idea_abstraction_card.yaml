@@ -1,0 +1,56 @@
+object_type: IdeaAbstractionCard
+status: active
+last_updated: "2026-04-30"
+linked_stage: literature_review
+linked_run: run_07
+
+domain_specific_idea: "Perturb-seq 섭동 예측의 평가 지표가 생물학적 충실도를 측정하지 못한다. MSE/R²는 재구성 정확도만 측정하며, 생물학적으로 올바른 예측과 단순 평균 예측을 구분하지 못한다. 이것이 Ahlmann-Eltze(2025)의 'DL ≤ baseline' 위기의 근본 원인일 가능성이 높다."
+
+abstract_principle:
+  statement: "최적화 목표(평가 지표)가 모델 행동을 결정한다. 잘못된 지표는 잘못된 최적화 목표를 만들고, 이는 잘못된 모델 행동과 잘못된 결론으로 이어진다. 생물학적 충실도를 측정하는 지표가 없으면, 모델 비교가 무의미하다"
+  confidence: "very_high"
+  rationale: "3개 독립 그룹의 수렴 증거: Ahlmann-Eltze(DL≤baseline), SCALE(mean-effect trap), Shesha(magnitude≠stability). 우리 자신의 CPA>FCR 결과도 같은 방향. 이것은 가설이 아닌 관찰된 사실"
+
+equivalent_representations:
+  statistics: ["평가 지표 설계 (metric design)", "측정 이론 (measurement theory)", "지표-결과 상관관계 (metric-outcome correlation)"]
+  machine_learning: ["벤치마크 설계 (benchmark design)", "모델 선택 기준 (model selection criterion)", "평가 프레임워크 (evaluation framework)"]
+  xai_interpretability: ["예측 품질의 생물학적 해석", "지표와 downstream 과업의 정렬"]
+  causal_inference: ["지표→최적화→행동의 인과 경로", "Goodhart's law in perturbation prediction"]
+  biology_domain: ["섭동 예측 평가 (perturbation prediction evaluation)", "생물학적 충실도 (biological fidelity)", "DEG 회복 (DEG recovery)"]
+  adjacent_domains: ["약물 반응 예측 평가", "단백질 구조 예측 벤치마크(CASP 모델)", "의료 AI 평가 프레임워크"]
+
+mandatory_search_queries:
+  within_domain: ["perturbation prediction evaluation metrics", "perturb-seq benchmark comparison", "single-cell perturbation model evaluation"]
+  adjacent_domain: ["drug response prediction evaluation", "CASP benchmark methodology", "medical AI evaluation framework"]
+  abstract_principle: ["Goodhart's law machine learning", "evaluation metric design methodology", "metric-outcome alignment"]
+  negative_control_queries: ["MSE sufficient for perturbation prediction", "current metrics adequate perturb-seq", "evaluation not a problem perturbation"]
+
+search_coverage:
+  domain_terms_searched: true
+  method_terms_searched: true
+  abstract_terms_searched: false
+  adjacent_domains_searched: false
+  recent_preprints_checked: true
+
+risk_flags:
+  false_zero_competitor_claim: false
+  terminology_tunnel_vision: "Cell-Eval(SCALE)과 Shesha가 부분적 경쟁자. 완전히 0은 아님. 그러나 통합 프레임워크 + 진단 + 위기 해결의 조합은 무경쟁"
+  domain_specific_repackaging: false
+
+conclusion:
+  idea_originality: "strong"
+  domain_application_novelty: "very_strong"
+  next_required_action: "Framing 진입 — RQ 구체화, BioEval 메트릭 설계, Ahlmann-Eltze 벤치마크 재현 계획"
+
+evidence:
+  - "Ahlmann-Eltze et al. (2025) Nature Methods: DL models ≤ linear baselines across 7+ benchmarks"
+  - "SCALE (Chen 2026): MSE creates mean-effect trap; PDCorr + DE overlap as alternatives"
+  - "Shesha (Raju 2026): magnitude correlates 0.75-0.97 with stability but discordant cases reveal biology"
+  - "Our run_12: CPA>FCR (0.430 vs 0.367) — simple model outperforms complex on current metrics"
+  - "Our run_12: prod rho=0.437 PASS vs A7 rho=0.326 PARTIAL — metric choice changes conclusion"
+  - "No existing framework provides gene-level + directional + biologically-grounded + implementation-robust metrics"
+uncertainty:
+  - "DL 모델이 BioEval 메트릭 하에서 baseline을 능가할지 여부 (둘 다 발표 가능한 결과)"
+  - "Cell-Eval(SCALE)과의 차별화 충분성 — 구체적 메트릭 설계에서 차이를 만들어야"
+  - "생물학적 충실도의 operational definition — 생물학자 합의 필요 가능성"
+human_review_needed: false

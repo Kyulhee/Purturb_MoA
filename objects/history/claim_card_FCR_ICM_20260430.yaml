@@ -1,0 +1,108 @@
+object_type: ClaimCard
+status: draft
+last_updated: "2026-04-29"
+linked_stage: framing
+linked_run: run_04
+
+current_positioning: "교세포 에피스태시스 전이 예측: ICM 불변성 기반 zero-shot 에피스태시스 예측 + UQ + AL. 순환 위험 없는 새로운 RQ3"
+
+claims:
+  strong_claims:
+    - "교세포 에피스태시스 전이 예측은 이전에 시도된 적이 없다 (직접 경쟁자 0개, PubMed+arXiv 검증)"
+    - "AL이 에피스태시스 탐지에서 random 대비 5.0× 개선 (Norman + Replogle)"
+    - "ICM 불변성 가정이 에피스태시스 교세포 보존으로 확장된다 (run_10 예비 근거)"
+  moderate_claims:
+    - "ICM 정렬이 교세포 에피스태시스 전이를 비인과 baseline 대비 개선한다 (예비: overlap 0.65, z_tx -0.35→+0.35 반전)"
+    - "MC Dropout이 대규모 perturb-seq 데이터에서 불확실성 정량화에 유효하다 (Replogle rho=0.660)"
+    - "공식 민감도가 에피스태시스에 영향을 미치나 치명적이지 않다 (76.6% 유전자별 방향 일치)"
+    - "교세포 AL이 에피스태시스 탐지 효율을 개선한다 (transfer overlap 0.65)"
+  weak_claims:
+    - "에피스태시스가 세포유형 간에 강하게 보존된다 (rho=0.444로 moderate, direction agreement 59%)"
+  disallowed_claims:
+    - "에피스태시스를 완벽히 분해할 수 있다"
+    - "모든 조합 섭동의 불확실성을 정량화한다"
+    - "에피스태시스가 세포유형 간에 완벽히 보존된다"
+
+claim_evidence_map:
+  - claim: "직접 경쟁자 0개 (교세포 에피스태시스 전이 예측)"
+    supporting_evidence:
+      - "PubMed 검색 0건 (cross-cell-type epistasis prediction)"
+      - "arXiv 검색 0건 (관련 결과 없음)"
+      - "stages/01: 43편 심층 리뷰에서 해당 주제 없음"
+    missing_evidence: []
+    risk_flags: []
+    allowed_strength: "strong"
+  - claim: "AL 5.0× 개선"
+    supporting_evidence:
+      - "run_09: Norman Top-5 AL 5.0x"
+      - "run_10: Replogle Top-5 AL 5.0x"
+    missing_evidence: []
+    risk_flags: []
+    allowed_strength: "strong"
+  - claim: "ICM 불변성→에피스태시스 보존 확장"
+    supporting_evidence:
+      - "run_10: Cross-CT 에피스태시스 rho=0.444 (p<1e-10)"
+      - "run_10: AL transfer overlap 0.65"
+      - "run_07: ICM 전이 R2 -0.30→0.92"
+    missing_evidence:
+      - "ICM 정렬→에피스태시스 전이 개선율의 직접 비교 (ICM vs no ICM 에피스태시스 전이)"
+    risk_flags:
+      - "인과 경로 검증 미완료: z_tx 정렬이 에피스태시스 순위 정렬로 이어지는지"
+    allowed_strength: "strong"
+  - claim: "ICM 정렬이 교세포 에피스태시스 전이 개선"
+    supporting_evidence:
+      - "run_07: ICM 없으면 z_tx 음의 상관(-0.35), ICM 있으면 양의 상관(+0.35)"
+      - "run_10: overlap 0.65"
+    missing_evidence:
+      - "에피스태시스 전이의 직접 ICM vs no-ICM 비교 미수행"
+    risk_flags:
+      - "z_tx 정렬 ≠ 에피스태시스 순위 정렬일 가능성"
+    allowed_strength: "moderate"
+  - claim: "MC Dropout UQ 유효 (Replogle rho=0.660)"
+    supporting_evidence:
+      - "run_10: Replogle holdout rho_mc=0.660 > 타겟 0.6"
+    missing_evidence:
+      - "Norman에서는 rho=0.401로 미달"
+    risk_flags:
+      - "데이터셋 크기 의존 가능성"
+    allowed_strength: "moderate"
+  - claim: "에피스태시스 강한 교세포 보존"
+    supporting_evidence:
+      - "run_10: rho=0.444"
+    missing_evidence: []
+    risk_flags:
+      - "rho=0.444는 moderate. direction agreement 59%도 우연(50%)보다 약간 높은 수준"
+    allowed_strength: "weak"
+
+required_caveats:
+  - "에피스태시스 교세포 보존은 부분적(rho=0.444)이며 강하지 않음"
+  - "UQ 유효성은 데이터셋 크기에 의존 (Norman 0.401 vs Replogle 0.660)"
+  - "ICM→에피스태시스 전이 개선의 직접 비교(ICM vs no-ICM) 미수행"
+
+reviewer_attack_points:
+  - attack: "rho=0.444로 교세포 에피스태시스 보존이 너무 약함"
+    defense: "우연(0)보다는 유의미. ICM 정렬이 이를 개선하는지가 핵심 질문. direction agreement 59%도 우연(50%)보다 유의미"
+    additional_evidence_needed: "ICM vs no-ICM 에피스태시스 전이 직접 비교"
+  - attack: "단일 아키텍처(FCR-ICM)만 테스트 — 일반성 부족"
+    defense: "인정. 다른 분해 아키텍처와 비교 필요"
+    additional_evidence_needed: "BuDDI, scDRP 등 유사 분해 방법과 비교"
+  - attack: "에피스태시스 정의의 공식 의존성이 전이 결과에 영향"
+    defense: "76.6% 유전자별 방향 일치 → 공식 민감도는 있으나 치명적이지 않음"
+    additional_evidence_needed: "3개 공식 각각에 대해 교세포 전이 rho 비교"
+
+decision:
+  ready_for_abstract: false
+  ready_for_results_section: false
+  ready_only_as_limitation_or_future_work: false
+
+evidence:
+  - "run_10: Cross-CT 에피스태시스 rho=0.444, overlap=0.65, AL 5.0x"
+  - "run_09: RQ1 r=1.000, Formula agreement 76.6%, AL 5.0x"
+  - "run_07: ICM 전이 R2 -0.30→0.92"
+  - "PubMed+arXiv: 교세포 에피스태시스 전이 예측 경쟁자 0건"
+uncertainty:
+  - "ICM→에피스태시스 전이 개선의 직접 비교 미수행"
+  - "에피스태시스 교세포 보존 강도 (moderate)"
+  - "단일 아키텍처만 검증"
+  - "PORTAL 대규모 외부 검증 미수행"
+human_review_needed: true

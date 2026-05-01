@@ -1,0 +1,73 @@
+object_type: ValidationReadinessCard
+status: active
+last_updated: "2026-04-29"
+linked_stage: framing
+linked_run: run_04
+
+target_claim: "ICM 정렬이 교세포 에피스태시스 전이를 비인과 baseline 대비 개선한다"
+
+evidence_status:
+  synthetic_ground_truth:
+    available: true
+    strength: "strong"
+    notes: "합성 잔차 분해 r=1.000 (run_09). 완벽한 합성 신호에서 분해 작동 확인"
+  real_data_internal:
+    available: true
+    strength: "moderate"
+    notes: "Cross-CT 에피스태시스 rho=0.444, AL overlap=0.65 (run_10). 단 ICM vs no-ICM 직접 비교 미수행"
+  external_ground_truth:
+    available: false
+    strength: "none"
+    notes: "PORTAL 665,856 쌍 대규모 검증 미수행"
+  cross_dataset_replication:
+    available: true
+    strength: "moderate"
+    notes: "Norman + Replogle 2개 데이터셋. RQ2 rho=0.660, RQ4 5.0x. RQ3 교세포 전이는 Replogle에서만 측정 가능"
+  hyperparameter_robustness:
+    available: true
+    strength: "moderate"
+    notes: "소거실험 6구성 (run_05, Phase 1-2만). Phase 3-6 소거 미실행 — Planning에서 설계 필요"
+  architecture_robustness:
+    available: false
+    strength: "none"
+    notes: "FCR-ICM 단일 아키텍처만 테스트. 다른 VAE/분해 아키텍처와 비교 없음"
+
+blockers:
+  - blocker: "ICM vs no-ICM 에피스태시스 전이 직접 비교 미수행"
+    severity: "high"
+    required_action: "소거실험: ICM 없는 모델에서 에피스태시스 전이 측정 → ICM 모델과 비교"
+  - blocker: "Phase 3-6 소거실험 미실행"
+    severity: "high"
+    required_action: "Planning에서 A2-A6 소거 설계 → 실행"
+  - blocker: "에피스태시스 Precision 미측정"
+    severity: "medium"
+    required_action: "trivial baseline(Precision~0.3) 대비 ICM 전이 Precision 측정"
+
+allowed_claim_strength:
+  current_level: "moderate"
+  rationale: "RQ2 PASS, RQ4 PASS, RQ3 예비 근거(rho=0.444). 단 ICM 전이 개선율 직접 비교와 소거실험 미수행. workshop paper는 충족, top venue는 소거+직접비교 필요"
+
+next_required_validation:
+  must_have:
+    - "ICM vs no-ICM 에피스태시스 전이 직접 비교 (핵심 소거)"
+    - "Phase 3-6 소거실험 (A2-A6)"
+    - "에피스태시스 Precision 측정 (trivial baseline 대비)"
+  nice_to_have:
+    - "PORTAL 대규모 검증"
+    - "다른 아키텍처와 비교 (BuDDI, scDRP)"
+    - "3개 공식 각각 교세포 전이 rho 비교"
+
+decision:
+  ready_for_paper_claim: false
+  ready_for_workshop_claim: true
+  ready_only_for_internal_report: false
+
+evidence:
+  - "run_10: Cross-CT 에피스태시스 rho=0.444, overlap=0.65, AL 5.0x"
+  - "run_09: RQ1 r=1.000, RQ4 5.0x"
+  - "run_07: ICM 전이 R2 -0.30→0.92"
+uncertainty:
+  - "ICM→에피스태시스 전이 개선율 미측정"
+  - "에피스태시스 교세포 보존 강도 (moderate)"
+  - "단일 아키텍처만 검증"
+human_review_needed: true

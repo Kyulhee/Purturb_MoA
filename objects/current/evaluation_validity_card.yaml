@@ -1,0 +1,83 @@
+object_type: EvaluationValidityCard
+status: active
+last_updated: "2026-04-30"
+linked_stage: planning
+linked_run: run_06
+
+constructs:
+  - construct: "생물학적 충실도 (biological fidelity)"
+    operational_definition: "예측이 생물학적으로 올바른 방향과 크기를 가지며, downstream 생물학적 과업(DEG 회복, AL 효율, hit prioritization)에서 유용한 정도"
+    measurement: "BioEval-Dir(방향 정확도) + BioEval-Cal(보정) + BioEval-DEG(DEG 회복)"
+    proxy_risk: "medium — 생물학적 유용성의 완전한 정의는 생물학자 합의 필요. DEG 회복 등은 프록시"
+
+  - construct: "지표-순위 반전 (metric-ranking reversal)"
+    operational_definition: "평가 지표를 MSE에서 BioEval로 변경했을 때 모델 순위가 체계적으로 변하는 현상"
+    measurement: "Kendall τ(MSE 순위, BioEval 순위). τ < 0.5 = 강한 반전, 0.5-0.7 = 부분 반전, > 0.7 = 유지"
+    proxy_risk: "low — τ는 비모수 순위 통계량으로, 분포 가정 불필요. 직접적 측정"
+
+  - construct: "downstream 생물학적 유용성 (downstream biological utility)"
+    operational_definition: "지표로 선택된 모델이 실제 생물학적 분석 과업에서 유용한 정도"
+    measurement: "DEG Precision@k, AL 효율(개선율), hit prioritization Spearman ρ, 교세포 전이 R²"
+    proxy_risk: "medium — AL/Hit prioritization은 시뮬레이션 기반. 실제 실험 검증은 별도 필요"
+
+metric_construct_alignment:
+  - metric: "MSE"
+    target_construct: "재구성 정확도"
+    alignment: "high (MSE는 재구성을 잘 측정)"
+    gap: "생물학적 방향/크기/DEG 회복과 정렬 안됨 (SCALE: mean-effect trap)"
+
+  - metric: "R²"
+    target_construct: "선형 상관"
+    alignment: "high (분포 매칭 측정)"
+    gap: "방향 무시, 아웃라이어 민감, DEG 식별과 불일치 (Zhu 2025)"
+
+  - metric: "AUPRC (Zhu 2025)"
+    target_construct: "DEG 회복"
+    alignment: "moderate (DEG 식별은 잘 측정)"
+    gap: "방향 미포함, 보정 미포함, 단일 수치(곡선 정보 손실)"
+
+  - metric: "PDCorr (SCALE)"
+    target_construct: "섭동 방향"
+    alignment: "moderate (섭동 수준 방향 측정)"
+    gap: "유전자 수준 분해 없음, 구현 민감성, 보정 미포함"
+
+  - metric: "BioEval-Dir"
+    target_construct: "유전자×섭동 수준 방향 정확도"
+    alignment: "high (직접적 측정)"
+    gap: "신규 지표 — 타당성 검증 필요 (S1 임계값 민감도로 방어)"
+
+  - metric: "BioEval-Cal"
+    target_construct: "효과크기 보정"
+    alignment: "high (직접적 측정)"
+    gap: "신규 지표 — 보정 기울기의 생물학적 의미 해석 필요"
+
+  - metric: "BioEval-Composite"
+    target_construct: "통합 생물학적 충실도"
+    alignment: "high (설계상 직접 측정)"
+    gap: "가중치 학습에 과적합 위험 → 5-fold CV로 방어"
+
+alternative_metrics_available:
+  - "MSE, R², Pearson: 분포 매칭 (기존 표준)"
+  - "DE overlap: 이진 DEG 교집합 (CPA 평가)"
+  - "AUPRC: DEG precision-recall (Zhu 2025)"
+  - "PDCorr: 섭동 방향 상관 (SCALE)"
+  - "Shesha stability: 기하학적 안정성 (Raju 2026)"
+  - "PDS: 분포 거리 (ARC Virtual Cell Challenge)"
+
+circularity_check:
+  rq1: "PASS — 지표-downstream 상관은 독립 변수(지표)와 종속 변수(downstream 과업)가 다름"
+  rq2: "PASS — BioEval 지표 설계와 downstream 과업 평가는 독립. BioEval-Composite 가중치는 downstream 상관에서 학습하나 5-fold CV로 순환 방지"
+  rq3: "PASS — Kendall τ는 두 지표 체계의 순위 비교. 순환 위험 없음"
+
+construct_validity_threats:
+  - threat: "생물학적 충실도의 단일 정의 불가"
+    severity: "medium"
+    mitigation: "3개 downstream 과업(DEG 회복, AL 효율, hit prioritization)으로 다면 평가"
+
+  - threat: "BioEval-Composite 가중치 과적합"
+    severity: "medium"
+    mitigation: "5-fold CV + 가중치 grid search 범위 제한 + S2 민감도 테스트"
+
+  - threat: "DEG 임계값이 BioEval-Dir 결과 지배"
+    severity: "medium"
+    mitigation: "S1 임계값 스윕 (0.1, 0.25, 0.5, 1.0) — 결과가 임계값에 견고해야 함"

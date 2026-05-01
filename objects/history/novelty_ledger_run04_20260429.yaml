@@ -1,0 +1,123 @@
+object_type: NoveltyLedger
+status: active
+last_updated: "2026-04-29"
+linked_stage: framing
+linked_run: run_04
+
+target_contribution: "FCR-ICM 기반 교세포 에피스태시스 전이 예측 + 불확실성 정량화 + 능동학습"
+
+novelty_layers:
+  abstract_principle:
+    claim: "에피스태시스가 세포유형 간에 부분 보존되며, 한 세포유형의 에피스태시스 패턴으로 새 세포유형의 에피스태시스를 zero-shot 예측 가능"
+    novelty_level: "strong"
+    prior_art:
+      - "C3TL: 교세포 일반 섭동 전이 (에피스태시스 특화 아님)"
+      - "CFM-GP: 교세포 flow matching (에피스태시스 전이 없음)"
+    interpretation: "에피스태시스의 교세포 보존을 예측에 활용하는 것은 새로운 원리. ICM 불변성 가정의 자연스러운 확장 (z_tx 불변 → 에피스태시스도 부분 불변)"
+  domain_application:
+    claim: "Perturb-seq 조합 섭동 잔차에서 교세포 에피스태시스 전이 예측"
+    novelty_level: "strong"
+    prior_art: []
+    interpretation: "직접 경쟁자 0개 (PubMed 0건, arXiv 0건). 누구도 교세포 에피스태시스 전이를 시도하지 않음"
+  method_specificity:
+    claim: "ICM 정렬 z_tx 기반 에피스태시스 전이 + MC Dropout UQ + 교세포 AL"
+    novelty_level: "strong"
+    prior_art:
+      - "CIPHER: 단일 신호원 불확실성 (교세포 전이 없음)"
+    interpretation: "ICM 정규화→z_tx 정렬→에피스태시스 전이의 인과 경로가 구체적 기여"
+  integration_synergy:
+    claim: "불확실성 높은 곳 = 에피스태시스 가능성 높은 곳 = 교세포 전이 우선 순위"
+    novelty_level: "strong"
+    prior_art: []
+    required_evidence_for_synergy:
+      - "ICM 전이가 비인과 전이 대비 에피스태시스 예측을 개선 (run_10 예비: overlap 0.65)"
+      - "UQ 기반 AL이 교세포 에피스태시스 탐지에서 5.0x 개선"
+    interpretation: "UQ→에피스태시스→교세포 전이의 3단계 연결이 새로운 통합 기여"
+
+contribution_decomposition:
+  components:
+    - component: "교세포 에피스태시스 전이 예측"
+      existing_prior_art: []
+      independently_novel: true
+      notes: "직접 경쟁자 0개. ICM 불변성→에피스태시스 보존→전이 예측의 원리적 연결"
+    - component: "잔차→에피스태시스 분해 (합성 검증)"
+      existing_prior_art: []
+      independently_novel: true
+      notes: "직접 경쟁자 0개 (잔차를 신호로 해석). RQ1 합성 r=1.000으로 작동 확인"
+    - component: "ICM 위반 = 불확실성 신호"
+      existing_prior_art:
+        - "ICM 원리 자체는 Schölkopf group"
+      independently_novel: true
+      notes: "ICM 위반을 불확실성으로 해석은 신규"
+    - component: "유전자별·섭동별 UQ (MC Dropout 기반)"
+      existing_prior_art:
+        - "CIPHER (단일 신호원)"
+      independently_novel: true
+      notes: "MC Dropout이 대규모 perturb-seq에서 유효 (Replogle rho=0.660)"
+    - component: "3-공식 민감도 분석"
+      existing_prior_art:
+        - "Ajmal 2025 (5개 GI scoring 벤치마크)"
+        - "Valenzuela 2025 (product neutrality)"
+      independently_novel: false
+      notes: "문헌에서 이미 입증된 공식 민감도를 실험에 반영. 76.6% 일치 확인"
+    - component: "교세포 에피스태시스 능동학습"
+      existing_prior_art:
+        - "NAIAD (적응적 임베딩 + AL, 단일 세포유형)"
+      independently_novel: true
+      notes: "교세포 에피스태시스 탐지 목적의 AL은 신규. 5.0x 개선, transfer overlap 0.65"
+    - component: "FCR z_x/z_t/z_tx 분해"
+      existing_prior_art:
+        - "FCR (arXiv:2410.22472)"
+      independently_novel: false
+      notes: "기존 방법 활용"
+
+competitive_density:
+  direct_domain_competitors:
+    - "CIPHER (섭동 예측 불확실성, 단일 신호원, 교세포 전이 없음)"
+  adjacent_domain_competitors:
+    - "GEARS (GI 분류, 학습 데이터 필요, 교세포 전이 없음)"
+    - "CPA (조합 예측, 잔차=오차 처리, 교세포 전이 없음)"
+    - "C3TL (교세포 일반 전이, 에피스태시스 특화 아님)"
+    - "CFM-GP (교세포 flow, 인과 분해 없음)"
+  abstract_principle_prior_art:
+    - "잔차 분석 (통계학 일반)"
+    - "에피스태시스 보존 (진화생물학, 세포유형 간 아님)"
+  direct_competitor_count: 1
+  density_decision: "low_competition"
+
+trivial_baseline_bound:
+  baseline_name: "가법 잔차 순위 전이 (K562 잔차 크기 순위 → RPE1 예측)"
+  expected_performance: "rho > 0 (잔차가 세포유형 간 부분 상관), 단 ICM 없이는 음의 상관 가능 (run_07: -0.35)"
+  target_delta_required: "ICM 전이 > 1.5× 비인과 전이. 순환 위험 없음"
+  rationale: "비인과 baseline은 음의 상관이 가능하므로, ICM 정렬이 전이를 양의 상관으로 반전하는 것이 핵심 기여"
+
+allowed_positioning:
+  disallowed_claims:
+    - "에피스태시스를 완벽히 분해할 수 있다"
+    - "모든 조합 섭동의 불확실성을 정량화한다"
+    - "에피스태시스가 세포유형 간에 완벽히 보존된다"
+  weak_claims:
+    - "에피스태시스가 세포유형 간에 강하게 보존된다 (rho=0.444로 moderate)"
+  moderate_claims:
+    - "ICM 정렬이 교세포 에피스태시스 전이를 개선한다"
+    - "MC Dropout이 대규모 perturb-seq에서 불확실성 정량화에 유효하다"
+    - "공식 민감도가 에피스태시스 전이에 영향을 미치나 치명적이지 않다"
+    - "교세포 AL이 에피스태시스 탐지 효율을 개선한다"
+  strong_claims:
+    - "교세포 에피스태시스 전이 예측은 이전에 시도된 적이 없다 (직접 경쟁자 0개)"
+    - "ICM 불변성 가정이 에피스태시스 교세포 보존으로 확장된다 (run_10 예비 근거)"
+    - "AL이 에피스태시스 탐지에서 random 대비 5.0× 개선 (Norman + Replogle)"
+
+next_required_action: "Planning 루프백 — 새 RQ3 기반 실험 설계. 소거실험(A2-A6, B1-B2) 포함. ICM 전이 개선율 타겟 설정"
+
+evidence:
+  - "run_10: Cross-CT 에피스태시스 rho=0.444, direction agreement=59%, AL overlap=0.65"
+  - "run_09: RQ1 합성 분해 r=1.000, Formula agreement 76.6%, AL 5.0x"
+  - "run_07: ICM 전이 R2 -0.30→0.92, z_tx 음의 상관→양의 상관 반전"
+  - "PubMed+arXiv 검색: 교세포 에피스태시스 전이 예측 직접 경쟁자 0건"
+uncertainty:
+  - "에피스태시스 교세포 보존 강도 (rho=0.444 — moderate)"
+  - "ICM 정렬→에피스태시스 전이 개선의 인과 경로 검증 미완료"
+  - "공식 민감도가 교세포 전이에 미치는 영향 미확인"
+  - "PORTAL 대규모 외부 검증 미수행"
+human_review_needed: true

@@ -1,0 +1,67 @@
+object_type: ValidationReadinessCard
+status: active
+last_updated: "2026-04-29"
+linked_stage: analysis
+linked_run: run_10
+
+target_claim: "FCR-ICM 잔차 분해가 에피스태시스 탐지에서 trivial baseline 대비 유의미한 개선"
+
+evidence_status:
+  synthetic_ground_truth:
+    available: true
+    strength: "strong"
+    notes: "합성 잔차 분해 r=1.000 (run_09). 완벽한 합성 신호에서 분해 작동 확인"
+  real_data_internal:
+    available: true
+    strength: "moderate"
+    notes: "Norman 104 double KO + Replogle cross-CT. RQ2 rho=0.660 (Replogle PASS), RQ4 5.0x PASS. 단 RQ3 AUROC=1.000 순환 의심"
+  external_ground_truth:
+    available: false
+    strength: "none"
+    notes: "PORTAL 665,856 쌍 대규모 검증 미수행"
+  cross_dataset_replication:
+    available: true
+    strength: "moderate"
+    notes: "Norman + Replogle 2개 데이터셋. Cross-CT 에피스태시스 rho=0.444, AL overlap 0.65"
+  hyperparameter_robustness:
+    available: true
+    strength: "moderate"
+    notes: "소거실험 6구성 (run_05). 모든 Norman config R2=0.86-0.89로 안정"
+  architecture_robustness:
+    available: false
+    strength: "none"
+    notes: "FCR-ICM 단일 아키텍처만 테스트. 다른 VAE/분해 아키텍처와 비교 없음"
+
+blockers:
+  - blocker: "RQ3 AUROC=1.000 순환 평가"
+    severity: "high"
+    required_action: "ICM/OOD 기반 독립 점수로 에피스태시스 탐지 평가"
+  - blocker: "RQ2 OOD distance 데이터셋 의존성"
+    severity: "medium"
+    required_action: "MC Dropout만으로 충분한지 확인 또는 OOD 정의 개선"
+
+allowed_claim_strength:
+  current_level: "moderate"
+  rationale: "RQ2 PASS, RQ4 PASS이나 RQ3 순환 해소 필요. workshop paper 수준은 충족, top venue는 RQ3 해소 후"
+
+next_required_validation:
+  must_have:
+    - "RQ3 순환 평가 해소 (ICM/OOD 독립 점수)"
+    - "RQ2 OOD 대안 마련"
+  nice_to_have:
+    - "PORTAL 대규모 검증"
+    - "다른 아키텍처와 비교"
+
+decision:
+  ready_for_paper_claim: false
+  ready_for_workshop_claim: true
+  ready_only_for_internal_report: false
+
+evidence:
+  - "run_10: RQ2 rho=0.660 PASS, RQ4 5.0x PASS"
+  - "run_09: RQ1 합성 r=1.000, Formula agreement 76.6%"
+  - "run_05-06: 소거실험 + 실제데이터 소거실험 완료"
+uncertainty:
+  - "RQ3 순환 평가 해소 전까지 strong claim 불가"
+  - "단일 아키텍처만 검증"
+human_review_needed: true

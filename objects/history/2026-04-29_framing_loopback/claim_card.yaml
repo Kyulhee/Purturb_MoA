@@ -1,0 +1,98 @@
+object_type: ClaimCard
+status: draft
+last_updated: "2026-04-29"
+linked_stage: interpretation
+linked_run: run_10
+
+current_positioning: "에피스태시스 탐지+UQ: moderate 결과, workshop 즉시 가능, top venue는 RQ3 해소 필요"
+
+claims:
+  strong_claims:
+    - "예측 잔차에서 에피스태시스 분해는 이전에 시도된 적이 없다 (직접 경쟁자 0개)"
+    - "AL이 에피스태시스 탐지에서 random 대비 5.0x 개선 (Norman + Replogle)"
+  moderate_claims:
+    - "MC Dropout이 대규모 perturb-seq 데이터에서 불확실성 정량화에 유효하다 (Replogle rho=0.660)"
+    - "3개 공식이 76.6% 유전자별 방향 일치 → 공식 민감도는 실제이나 치명적이지 않다"
+    - "ICM 위반 점수가 불확실성 프록시로 작동한다 (Norman rho=0.385)"
+    - "Cross-CT 에피스태시스 부분 보존 (K562↔RPE1 rho=0.444, AL overlap 0.65)"
+  weak_claims:
+    - "에피스태시스 탐지 AUROC > 0.75 (순환 평가 의심으로 약화)"
+    - "OOD distance가 조합 불확실성 프록시로 작동한다 (Replogle에서 무효)"
+  disallowed_claims:
+    - "에피스태시스를 완벽히 분해할 수 있다"
+    - "모든 조합 섭동의 불확실성을 정량화한다"
+
+claim_evidence_map:
+  - claim: "직접 경쟁자 0개 (잔차→에피스태시스 분해)"
+    supporting_evidence:
+      - "run_06: 5개 용어 체계 + 백그라운드 에이전트 30+ 쿼리 검증"
+    missing_evidence: []
+    risk_flags: []
+    allowed_strength: "strong"
+  - claim: "AL 5.0x 개선"
+    supporting_evidence:
+      - "run_09: Norman Top-5 AL 5.0x"
+      - "run_10: Replogle Top-5 AL 5.0x"
+    missing_evidence: []
+    risk_flags: []
+    allowed_strength: "strong"
+  - claim: "MC Dropout UQ 유효 (Replogle rho=0.660)"
+    supporting_evidence:
+      - "run_10: Replogle holdout rho_mc=0.660 > 타겟 0.6"
+    missing_evidence:
+      - "Norman에서는 rho=0.401로 미달"
+    risk_flags:
+      - "데이터셋 크기 의존 가능성"
+    allowed_strength: "moderate"
+  - claim: "3-공식 76.6% 일치"
+    supporting_evidence:
+      - "run_09: additive/multiplicative/product 방향 일치율"
+    missing_evidence: []
+    risk_flags:
+      - "23.4% 불일치 유전자 존재"
+    allowed_strength: "moderate"
+  - claim: "에피스태시스 AUROC > 0.75"
+    supporting_evidence:
+      - "run_09: AUROC=1.000"
+    missing_evidence: []
+    risk_flags:
+      - "순환 평가 의심 — ground-truth와 동일 신호 사용 가능성"
+    allowed_strength: "weak"
+  - claim: "OOD distance가 불확실성 프록시"
+    supporting_evidence:
+      - "run_09: Norman OOD rho=0.385"
+    missing_evidence: []
+    risk_flags:
+      - "run_10: Replogle OOD rho=-0.340으로 무효"
+    allowed_strength: "weak"
+
+required_caveats:
+  - "RQ3 AUROC=1.000은 순환 평가 가능성이 있어 독립 검증 필요"
+  - "UQ 유효성은 데이터셋 크기에 의존 (Norman 0.401 vs Replogle 0.660)"
+  - "OOD distance는 단일 섭동만 있는 데이터에서 조합 불확실성 프록시로 부적합"
+
+reviewer_attack_points:
+  - attack: "AUROC 1.000은 너무 완벽 — 순환 의심"
+    defense: "순환 가능성 인정. ICM/OOD 기반 독립 점수로 재평가 필요"
+    additional_evidence_needed: "순환 없는 독립 에피스태시스 탐지 평가"
+  - attack: "Norman 104 double KO로는 통계적 검증력 부족"
+    defense: "Replogle 추가 검증, cross-CT 일관성 확인"
+    additional_evidence_needed: "PORTAL 대규모 검증"
+  - attack: "FCR-ICM 단일 아키텍처만 테스트 — 일반성 부족"
+    defense: "인정. 다른 분해 아키텍처와 비교 필요"
+    additional_evidence_needed: "BuDDI, scDRP 등 유사 분해 방법과 비교"
+
+decision:
+  ready_for_abstract: false
+  ready_for_results_section: true
+  ready_only_as_limitation_or_future_work: false
+
+evidence:
+  - "run_09: Norman 에피스태시스+UQ 전체 결과"
+  - "run_10: Replogle 다세포유형 에피스태시스+UQ 전체 결과"
+  - "run_06: 직접 경쟁자 0개 검증"
+uncertainty:
+  - "RQ3 순환 평가 해소 전까지 AUROC strong claim 불가"
+  - "단일 아키텍처만 검증"
+  - "PORTAL 대규모 외부 검증 미수행"
+human_review_needed: true

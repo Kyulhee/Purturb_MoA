@@ -1,0 +1,81 @@
+object_type: EvaluationValidityCard
+status: active
+last_updated: "2026-04-30"
+linked_stage: planning
+linked_run: run_05
+
+target_construct: "에피스태시스 교세포 보존 정량화 + 잔차 순위 전이 예측 + MC Dropout UQ"
+primary_metric: "Cross-CT 에피스태시스 Spearman rho (잔차 순위 전이) + AL 개선율"
+
+metric_construct_alignment:
+  alignment_level: "strong"
+  rationale: "RQ3는 K562→RPE1 잔차 순위 전이로 ground-truth가 예측 신호와 독립. 순환 위험 없음. rho가 연속 순위 평가로 에피스태시스 스펙트럼에 적합. ICM 전이 개선율은 run_11에서 기각되어 주 지표에서 제외"
+
+known_metric_risks:
+  proxy_mismatch:
+    present: true
+    explanation: "Replogle에 조합 섭동이 없어, 에피스태시스를 예측 오차 프록시로 측정. Norman에서 Precision 직접 측정으로 보완"
+  tautology_risk:
+    present: false
+    explanation: "K562 잔차 순위로 RPE1 에피스태시스 예측 — ground-truth(RPE1)가 예측 신호(K562)와 독립. 순환 불가능"
+  dataset_dependence:
+    present: true
+    explanation: "에피스태시스 교세포 보존이 데이터셋에 의존. Replogle에서만 측정. PORTAL 외부 검증 필요"
+  threshold_subjectivity:
+    present: true
+    explanation: "에피스태시스 판정 임계값이 공식에 따라 변함. 3-공식 민감도 분석으로 완화"
+  simplicity_bias:
+    present: true
+    explanation: "잔차 순위 전이(A7)가 너무 단순하여 novelty로 인정받지 못할 위험. '발견의 novelty' vs '방법의 novelty' 분리 필요"
+
+alternative_metrics:
+  required:
+    - "Cross-CT 에피스태시스 Spearman rho (잔차 순위 전이)"
+    - "AL Top-k 개선율 (교세포)"
+    - "U-Error Spearman rho — MC-only (Replogle)"
+    - "에피스태시스 Precision (Norman, trivial 대비)"
+  optional:
+    - "Top-k overlap (에피스태시스)"
+    - "Coverage (90% CI)"
+    - "3-공식 각각 교세포 전이 rho"
+    - "AL Transfer overlap"
+    - "ICM z_tx 전이 rho (부정적 결과 재확인용)"
+
+validation_design:
+  internal_validation:
+    - "합성 데이터 잔차 분해 검증 (r>0.7 달성, run_09)"
+    - "ICM vs no-ICM 잔차 분해 질 비교 (A1 vs A2, Precision/Coverage)"
+    - "잔차 순위 전이 vs ICM z_tx 전이 비교 (A1 vs A7, 부정적 결과 재확인)"
+    - "Replogle K562→RPE1 zero-shot 잔차 순위 전이 (run_11: rho=0.402)"
+    - "3-공식 각각 교세포 전이 rho"
+    - "Norman 에피스태시스 Precision (trivial 대비, run_11: 0.60-0.75)"
+  external_validation:
+    - "PORTAL 665,856 쌍 대규모 검증 (미수행)"
+  negative_controls:
+    - "ICM z_tx 전이: run_11에서 잔차 순위보다 열위 (rho 0.356 vs 0.402)"
+    - "비인과 전이: ICM 없이 z_tx로 전이 (A2 rho=0.369)"
+    - "랜덤 조합 순서: 우연 수준 baseline"
+  sensitivity_analysis:
+    - "3-공식 민감도 (additive/multiplicative/product, 각각 교세포 전이 rho)"
+    - "MC Dropout p 튜닝 (0.05, 0.1, 0.2)"
+    - "에피스태시스 임계값 변화에 따른 Precision/Recall 곡선"
+
+decision:
+  metric_allowed_for_primary_claim: true
+  metric_allowed_only_as_supporting_evidence: null
+  required_before_analysis:
+    - "A1 vs A2 소거: ICM 정규화가 잔차 분해 질에 기여하는지"
+    - "A1 vs A7 소거: 잔차 순위 전이 > ICM z_tx 전이 재확인"
+    - "Coverage 측정: UQ 교정도"
+
+evidence:
+  - "run_11: A7 잔차 순위 전이 rho=0.402 (최고), ICM 개선율 0.966× (기각), AL 4-8×, Precision 0.60-0.75"
+  - "run_10: MC Dropout rho=0.660, Cross-CT rho=0.444"
+  - "run_09: RQ1 r=1.000, AUROC=1.0 순환 → rho로 해소"
+  - "run_07: ICM 전이 R2 -0.30→0.92 (일반 전이에는 유효)"
+uncertainty:
+  - "잔차 순위 전이의 PORTAL 일반성"
+  - "Coverage 미측정"
+  - "잔차 순위 전이의 novelty 인정 여부 (단순 방법)"
+  - "ICM 부정적 결과의 리뷰어 반응"
+human_review_needed: true

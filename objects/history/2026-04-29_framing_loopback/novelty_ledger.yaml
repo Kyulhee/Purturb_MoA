@@ -1,0 +1,123 @@
+object_type: NoveltyLedger
+status: active
+last_updated: "2026-04-29"
+linked_stage: framing
+linked_run: run_06
+
+target_contribution: "FCR-ICM 잔차에서 에피스타시스 원칙적 분해 + 불확실성 정량화 + 능동학습"
+
+novelty_layers:
+  abstract_principle:
+    claim: "예측 잔차를 구조적 신호와 오차로 분해하여 예측 실패에서 지식 추출"
+    novelty_level: "moderate"
+    prior_art:
+      - "CPA: 조합 실패를 오차로 처리"
+      - "GEARS: 학습 데이터에서 GI 분류 (잔차 활용 없음)"
+    interpretation: "원리 자체는 통계적 잔차 분석과 유사하나, perturb-seq 도메인에 적용은 신규"
+
+  domain_application:
+    claim: "Perturb-seq 조합 섭동 잔차에서 에피스타시스 탐지"
+    novelty_level: "strong"
+    prior_art: []
+    interpretation: "직접 경쟁자 0개 (run_06 검증). 누구도 잔차를 신호로 해석하지 않음"
+
+  method_specificity:
+    claim: "ICM 위반 점수 + MC Dropout + 가법 잔차 결합 UQ; 3-공식 민감도 분석"
+    novelty_level: "strong"
+    prior_art:
+      - "CIPHER: 단일 신호원 불확실성"
+    interpretation: "다중 신호원 결합과 3-공식 민감도는 구체적 기여"
+
+  integration_synergy:
+    claim: "불확실성 높은 곳 = 에피스태시스 가능성 높은 곳의 자연스러운 연결"
+    novelty_level: "moderate"
+    prior_art: []
+    required_evidence_for_synergy:
+      - "UQ-에피스태시스 상관관계 실증"
+      - "AL 획득 함수에서 에피스태시스 우선 탐지 확인"
+    interpretation: "개념적 연결은 직관적이나 실증적 검증 필요 — run_09/10에서 부분 확인"
+
+contribution_decomposition:
+  components:
+    - component: "잔차→에피스태시스 분해"
+      existing_prior_art: []
+      independently_novel: true
+      notes: "직접 경쟁자 0개"
+    - component: "ICM 위반 = 불확실성 신호"
+      existing_prior_art:
+        - "ICM 원리 자체는 Schölkopf group"
+      independently_novel: true
+      notes: "ICM 위반을 불확실성으로 해석은 신규"
+    - component: "유전자별·섭동별 UQ"
+      existing_prior_art:
+        - "CIPHER (단일 신호원)"
+      independently_novel: true
+      notes: "다중 신호원 결합이 차별점"
+    - component: "3-공식 민감도 분석"
+      existing_prior_art:
+        - "Ajmal 2025 (5개 GI scoring 벤치마크)"
+        - "Valenzuela 2025 (product neutrality)"
+      independently_novel: false
+      notes: "문헌에서 이미 입증된 공식 민감도를 실험에 반영"
+    - component: "불확실성 기반 능동학습"
+      existing_prior_art:
+        - "NAIAD (적응적 임베딩 + AL)"
+      independently_novel: true
+      notes: "에피스태시스 탐지 목적의 AL은 신규"
+    - component: "FCR z_x/z_t/z_tx 분해"
+      existing_prior_art:
+        - "FCR (arXiv:2410.22472)"
+      independently_novel: false
+      notes: "기존 방법 활용"
+    - component: "교세포 전이 (ICM 기반)"
+      existing_prior_art:
+        - "CFM-GP, C3TL"
+      independently_novel: false
+      notes: "ICM 불변성 활용은 신규 해석이나 전이 자체는 기존"
+
+competitive_density:
+  direct_domain_competitors:
+    - "CIPHER (섭동 예측 불확실성, 단일 신호원)"
+  adjacent_domain_competitors:
+    - "GEARS (GI 분류, 학습 데이터 필요)"
+    - "CPA (조합 예측, 잔차=오차 처리)"
+  abstract_principle_prior_art:
+    - "잔차 분석 (통계학 일반)"
+  direct_competitor_count: 1
+  density_decision: "low_competition"
+
+trivial_baseline_bound:
+  baseline_name: "가법 잔차 = 에피스태시스 (trivial decomposition)"
+  expected_performance: "Recall ~100%, Precision ~0.3 (run_08 확인)"
+  target_delta_required: "Precision 0.3→0.6 이상 (2x 개선)"
+  rationale: "trivial baseline은 민감도가 높으나 정밀도가 낮음 — 원칙적 분해로 정밀도 개선이 핵심 기여"
+
+allowed_positioning:
+  disallowed_claims:
+    - "에피스태시스를 완벽히 분해할 수 있다"
+    - "모든 조합 섭동의 불확실성을 정량화한다"
+  weak_claims:
+    - "에피스태시스 탐지가 trivial baseline보다 정밀도가 높다 (AUROC 기준)"
+  moderate_claims:
+    - "ICM 위반 점수가 불확실성 프록시로 작동한다 (Norman: rho=0.385)"
+    - "MC Dropout이 대규모 데이터에서 불확실성 정량화에 유효하다 (Replogle: rho=0.660)"
+    - "3개 공식이 76.6% 유전자별 방향 일치 → 공식 민감도는 실제이나 치명적이지 않다"
+  strong_claims:
+    - "예측 잔차에서 에피스태시스 분해는 이전에 시도된 적이 없다 (직접 경쟁자 0개)"
+    - "AL이 에피스태시스 탐지에서 random 대비 5.0x 개선 (run_09/10)"
+
+decision:
+  novelty_status: "strong"
+  continue_allowed: true
+  required_revision: []
+  next_required_action: "RQ2 OOD 해결, RQ3 순환 평가 해소"
+
+evidence:
+  - "run_06: 5개 용어 체계 + 백그라운드 에이전트 30+ 쿼리로 직접 경쟁자 0개 확인"
+  - "run_09: Norman 에피스태시스+UQ 실험"
+  - "run_10: Replogle 다세포유형 에피스태시스+UQ 실험, RQ2 rho=0.660 PASS"
+uncertainty:
+  - "RQ2 OOD: Replogle에서 음의 상관(-0.340). MC Dropout만 의존 가능한지"
+  - "RQ3 순환 평가: AUROC=1.000은 ground-truth와 같은 신호 사용 가능성"
+  - "PORTAL 대규모 검증 미수행"
+human_review_needed: false

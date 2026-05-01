@@ -1,0 +1,132 @@
+object_type: ResultCard
+status: active
+last_updated: "2026-04-29"
+linked_stage: analysis
+linked_run: run_11
+
+experiment_id: "run_11"
+linked_experiment_contract: "objects/current/experiment_contract.yaml"
+
+result_summary:
+  primary_metric:
+    name: "ICM 전이 개선율 (Cross-CT 에피스태시스)"
+    value: 0.966
+    threshold: 1.5
+    pass_fail: "CRITICAL_FAIL"
+    notes: "ICM이 에피스태시스 전이를 개선하지 못함. A1(ICM) rho_add=0.356 < A2(no-ICM) rho_add=0.369"
+  secondary_metrics:
+    - name: "Cross-CT 에피스태시스 rho (add)"
+      value: 0.356
+      threshold: 0.4
+      pass_fail: "partial_fail"
+      notes: "A1(ICM). prod=0.428은 타겟 달성"
+    - name: "Cross-CT 에피스태시스 rho (prod)"
+      value: 0.428
+      threshold: 0.4
+      pass_fail: "pass"
+      notes: "A1(ICM). 공식 중 최고"
+    - name: "RQ2 rho_combined"
+      value: 0.524
+      threshold: 0.6
+      pass_fail: "fail"
+      notes: "run_10의 0.660보다 저하. MC-only에 collapse (ICM weight=0.0)"
+    - name: "AL Top-10 improvement"
+      value: 4.0
+      threshold: 2.0
+      pass_fail: "pass"
+    - name: "AL Top-20 improvement"
+      value: 8.0
+      threshold: 2.0
+      pass_fail: "pass"
+    - name: "AL Transfer overlap"
+      value: 0.80
+      threshold: 0.5
+      pass_fail: "pass"
+    - name: "Norman Precision (top-10)"
+      value: 0.750
+      threshold: 0.6
+      pass_fail: "pass"
+    - name: "Norman Precision (top-20)"
+      value: 0.600
+      threshold: 0.6
+      pass_fail: "pass"
+    - name: "A7 잔차 순위 전이 rho"
+      value: 0.402
+      threshold: null
+      pass_fail: "informational"
+      notes: "A1(ICM) rho_add=0.356보다 우수 — ICM 전이보다 단순 baseline이 나음"
+    - name: "A8 UQ 순위 전이 rho"
+      value: 0.360
+      threshold: null
+      pass_fail: "informational"
+
+baseline_comparison:
+  baselines:
+    - name: "A1 (ICM 전이)"
+      metric: "Cross-CT 에피스태시스 rho (add)"
+      value: 0.356
+    - name: "A2 (비인과 전이)"
+      metric: "Cross-CT 에피스태시스 rho (add)"
+      value: 0.369
+      notes: "ICM 없이도 A1보다 높음"
+    - name: "A7 (잔차 순위 전이)"
+      metric: "Cross-CT 에피스태시스 rho"
+      value: 0.402
+      notes: "가장 간단한 baseline이 ICM 전이보다 우수"
+    - name: "A8 (UQ 순위 전이)"
+      metric: "Cross-CT 에피스태시스 rho"
+      value: 0.360
+    - name: "Random"
+      metric: "Cross-CT 에피스태시스 rho"
+      value: 0.0
+  trivial_baseline_delta:
+    value: "A7 > A1"
+    meaningful: false
+    rationale: "ICM 정규화가 에피스태시스 전이에 부정적 기여. A7(단순 잔차 순위)이 최고"
+
+ablation_summary:
+  critical_ablation_A1_vs_A2:
+    result: "ICM 정규화가 에피스태시스 전이를 개선하지 못함 (0.966×)"
+    implication: "주 가설 기각. ICM MMD 정규화는 z_tx 분포 정렬에는 유효하나 에피스태시스 전이에는 무효"
+  critical_ablation_A1_vs_A7:
+    result: "A7(잔차 순위) rho=0.402 > A1(ICM) rho_add=0.356"
+    implication: "방법론 기여 없음. 가장 단순한 baseline이 최적"
+  formula_sensitivity:
+    result: "add=0.356, mult=0.403, prod=0.428 (ICM); add=0.369, mult=0.419, prod=0.421 (no-ICM)"
+    implication: "공식 민감도는 moderate. prod가 일관 최고. ICM 유무와 무관"
+  effective_components:
+    - "에피스태시스 교세포 보존 자체 (rho 0.36-0.43, 모두 p<1e-26)"
+    - "AL 획득 함수 (4-8× random 개선)"
+    - "MC Dropout (UQ에서 유일한 유효 신호)"
+  dispensable_components:
+    - "ICM 위반 점수 (UQ weight=0.0, 전이 rho=0.158로 무효)"
+    - "ICM 정규화 (에피스태시스 전이에 부정적)"
+  harmful_components:
+    - "ICM MMD 정규화 (에피스태시스 전이 rho 저하, UQ weight=0.0)"
+    - "ICM 위반 신호 (ICM 모델에서 전이 가능성이 더 낮음: 0.158 vs no-ICM 0.239)"
+
+unexpected_findings:
+  - "ICM 정규화가 에피스태시스 전이를 오히려 약간 저해 (0.966×)"
+  - "A7(단순 잔차 순위 전이)가 A1(ICM 전이)보다 우수 (rho 0.402 vs 0.356)"
+  - "ICM 위반 점수의 전이 가능성이 ICM 모델에서 더 낮음 (0.158 vs 0.239) — MMD가 위반 신호를 왜곡"
+  - "에피스태시스 교세포 보존은 ICM 없이도 존재 (rho 0.37-0.43) — ICM이 아닌 생물학적 보존"
+
+interpretation:
+  strengthens_claims:
+    - "에피스태시스가 세포유형 간에 보존됨 (rho 0.36-0.43, ICM과 무관)"
+    - "AL이 교세포 에피스태시스 탐지에서 유효 (4-8×)"
+    - "Norman 에피스태시스 Precision이 trivial 대비 유의미 (2.0-2.5×)"
+  weakens_claims:
+    - "ICM 정규화의 에피스태시스 전이 기여: 없음 (핵심 가설 기각)"
+    - "ICM 위반=불확실성 신호 해석: 무효 (UQ weight=0.0)"
+    - "RQ2 rho_combined: 0.524 (0.6 미달, run_10의 0.660보다 저하)"
+  kills_claims:
+    - "ICM 정렬이 교세포 에피스태시스 전이를 개선한다 — 기각"
+  new_questions:
+    - "ICM이 z_tx 분포 정렬에는 유효하나 에피스태시스 전이에는 무효한 이유는?"
+    - "에피스태시스 교세포 보존의 원천이 ICM이 아니라면 무엇인가?"
+    - "ICM 없이도 에피스태시스 전이가 가능하다면 ICM의 역할은 무엇인가?"
+
+recommended_next_step:
+  decision: "loopback_to_framing"
+  rationale: "실험 계약 실패 기준 트리거: 'ICM 전이 < baseline: ICM이 에피스태시스 전이를 개선하지 못함'. loopback_target: framing. 주 가설 재구성 필요"

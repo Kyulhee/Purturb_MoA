@@ -1,0 +1,100 @@
+object_type: ValidationReadinessCard
+status: active
+last_updated: "2026-04-30"
+linked_stage: analysis
+linked_run: run_12
+
+target_claim: "에피스태시스가 세포유형 간에 부분 보존되어, 잔차 순위 전이로 새 세포유형의 에피스태시스를 예측할 수 있는가"
+
+evidence_status:
+  synthetic_ground_truth:
+    available: true
+    strength: "strong"
+    notes: "합성 잔차 분해 r=1.000 (run_09). 분해 메커니즘 자체는 유효"
+  real_data_internal:
+    available: true
+    strength: "moderate"
+    notes: "run_12: prod rho=0.437 PASS, add rho=0.367 PARTIAL. A7 rho=0.326 PARTIAL. p<1e-22 for all"
+  external_ground_truth:
+    available: false
+    strength: "none"
+    notes: "PORTAL 대규모 검증 미수행"
+  cross_dataset_replication:
+    available: true
+    strength: "moderate"
+    notes: "Norman Precision 0.731 PASS, Replogle AL 2.67× PASS, Transfer overlap 0.750 PASS"
+  hyperparameter_robustness:
+    available: true
+    strength: "moderate"
+    notes: "A1-A7 + B1 소거실험 완료. 3-공식 민감도 측정. ICM lambda=1값만"
+  architecture_robustness:
+    available: true
+    strength: "moderate"
+    notes: "FCR-ICM + CPA(B1) baseline 비교 완료. CPA가 오히려 우수(0.430 vs 0.367)"
+  uq_calibration:
+    available: true
+    strength: "negative"
+    notes: "Coverage 0.293 — 심각한 under-coverage. 90% CI 불신뢰"
+
+blockers:
+  - blocker: "Coverage (90% CI) = 0.293, 타겟 0.85-0.95 대비 심각 미달"
+    severity: "critical"
+    required_action: "Conformal prediction 교정 또는 MC Dropout rate 증가. UQ calibration 클레임 불가"
+  - blocker: "A7 잔차 순위 전이 rho=0.326 (PARTIAL, 타겟 0.4 미달)"
+    severity: "high"
+    required_action: "prod formula(rho=0.437)로 주 전이 지표 변경 고려. 또는 PARTIAL claim 수용"
+  - blocker: "CPA baseline이 FCR보다 에피스태시스 전이에서 우수 (0.430 vs 0.367)"
+    severity: "moderate"
+    required_action: "에피스태시스 보존은 단순 현상으로 프레이밍. FCR의 가치는 UQ+AL+해석가능성에 있음"
+
+allowed_claim_strength:
+  current_level: "moderate_partial"
+  rationale: "에피스태시스 교세포 보존은 입증(prod rho=0.437 PASS). AL/Precision 통과. 그러나 Coverage 실패로 UQ calibration 클레임 불가. ICM 기여는 여전히 부정적. CPA가 FCR보다 우수."
+  possible_claims:
+    - claim: "에피스태시스가 세포유형 간에 부분 보존된다 (prod rho=0.437, p<1e-41)"
+      strength: "moderate_strong"
+      notes: "3개 공식 모두 유의. 직접 경쟁자 없음. CPA에서도 확인(0.430)"
+    - claim: "MC Dropout이 섭동 예측 오차와 상관된다 (rho=0.786)"
+      strength: "moderate"
+      notes: "상관관계는 강하나 calibration(coverage)은 실패"
+    - claim: "MC Dropout 90% CI가 well-calibrated이다"
+      strength: "refuted"
+      notes: "Coverage 0.293. 절대 불가"
+    - claim: "불확실성 기반 AL이 교세포 에피스태시스 탐지에서 유효하다"
+      strength: "moderate"
+      notes: "2.67× improvement, transfer overlap 0.750"
+    - claim: "ICM 정규화가 에피스태시스 전이를 개선한다"
+      strength: "refuted"
+      notes: "run_12: 1.005×. run_11: 0.966×. 일관된 부정적 결과"
+    - claim: "에피스태시스 교세포 보존은 단순 생물학적 현상이다"
+      strength: "moderate"
+      notes: "CPA(0.430) > FCR(0.367). Factorized decomposition 불필요"
+
+next_required_validation:
+  must_have:
+    - "Coverage 교정: conformal prediction으로 0.85-0.95 달성 가능한지 확인"
+    - "주 전이 지표 결정: A7(rho=0.326) vs prod formula(rho=0.437) — 어느 것을 클레임에 사용할 것인가"
+  nice_to_have:
+    - "PORTAL 대규모 검증"
+    - "MC Dropout rate 튜닝 (0.05-0.5 범위)"
+    - "ICM lambda 튜닝 (현재 1값만)"
+
+decision:
+  ready_for_paper_claim: false
+  ready_for_workshop_claim: false
+  ready_only_for_internal_report: true
+  notes: "에피스태시스 보존 발견은 유효하나 (1) Coverage 실패, (2) CPA>FCR, (3) ICM 부정적 결과로 완전한 논문 클레임 불가. Coverage 교정 후 재평가 필요"
+
+evidence:
+  - "run_12: prod rho=0.437 PASS, A7 rho=0.326 PARTIAL, CPA rho=0.430"
+  - "run_12: rho_mc=0.786 PASS, Coverage 0.293 FAIL, AL 2.67× PASS"
+  - "run_12: Norman prec_top20=0.731 PASS, Norman coverage=0.235 FAIL"
+  - "run_12: ICM imp=1.005× (negative result confirmed)"
+  - "run_11: A7 rho=0.402, ICM imp=0.966×, AL 4-8×"
+  - "run_10: rho_mc=0.660, Cross-CT rho=0.444"
+uncertainty:
+  - "Coverage 실패의 근본 원인 (MC Dropout rate? 모델 과신?)"
+  - "Conformal prediction으로 coverage 교정 가능 여부"
+  - "CPA>FCR이 에피스태시스 보존의 단순성을 지지하는지 해석"
+  - "A7 rho 저하(0.402→0.326)의 정확한 원인 (데이터 파이프라인?)"
+human_review_needed: true

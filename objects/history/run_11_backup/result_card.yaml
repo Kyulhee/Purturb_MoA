@@ -1,0 +1,119 @@
+object_type: ResultCard
+status: active
+last_updated: "2026-04-29"
+linked_stage: analysis
+linked_run: run_10
+
+experiment_id: "run_09+10"
+linked_experiment_contract: "objects/current/experiment_contract.yaml"
+
+result_summary:
+  primary_metric:
+    name: "U-Error Spearman rho (Replogle)"
+    value: 0.660
+    threshold: 0.6
+    pass_fail: "pass"
+  secondary_metrics:
+    - name: "Cross-CT 에피스태시스 rho"
+      value: 0.444
+      threshold: 0.4
+      pass_fail: "pass"
+      notes: "새 RQ3의 핵심 지표. 우연(0)보다 유의미"
+    - name: "AL Top-5 improvement (에피스태시스)"
+      value: 5.0
+      threshold: 2.0
+      pass_fail: "pass"
+    - name: "AL Transfer overlap"
+      value: 0.65
+      threshold: 0.5
+      pass_fail: "pass"
+    - name: "Formula agreement"
+      value: 0.766
+      threshold: 0.6
+      pass_fail: "pass"
+    - name: "RQ1 잔차 분해 (합성)"
+      value: 1.000
+      threshold: 0.7
+      pass_fail: "pass"
+    - name: "Holdout rho_mc (Norman)"
+      value: 0.401
+      threshold: 0.6
+      pass_fail: "fail"
+      notes: "작은 데이터셋에서 UQ 신호 약함"
+    - name: "ICM 전이 개선율 (에피스태시스)"
+      value: null
+      threshold: 1.5
+      pass_fail: "not_measured"
+      notes: "핵심 소거 미수행 — ICM vs no-ICM 에피스태시스 전이 비교 필요"
+
+baseline_comparison:
+  baselines:
+    - name: "비인과 전이 (ICM 없음)"
+      metric: "Cross-CT 에피스태시스 rho"
+      value: null
+      notes: "미측정. z_tx는 음의 상관(-0.35) 예상. 에피스태시스 전이도 음의 상관 예상"
+    - name: "가법 잔차 순위 전이"
+      metric: "Cross-CT 에피스태시스 rho"
+      value: null
+      notes: "미측정"
+    - name: "FCR-ICM (본 제안)"
+      metric: "Cross-CT 에피스태시스 rho"
+      value: 0.444
+      notes: "run_10에서 측정"
+  trivial_baseline_delta:
+    value: null
+    meaningful: null
+    rationale: "ICM vs no-ICM 직접 비교 미수행. 이것이 다음 run의 핵심 목표"
+
+ablation_summary:
+  effective_components:
+    - "ICM 정규화 (RQ1 교세포 정렬: 합성 0.50→0.97, 실제 -0.35→0.35)"
+    - "MC Dropout (Replogle rho=0.660 유효)"
+    - "AL 획득 함수 (5.0x random 개선, transfer overlap 0.65)"
+  dispensable_components:
+    - "조합 일관성 손실 (실제데이터에서 불필요, run_06)"
+    - "OOD distance (Replogle에서 무효, rho=-0.340)"
+  harmful_components:
+    - "Comp loss (실제데이터에서 오히려 R2 0.88→0.86 저하, run_06)"
+  untested_components:
+    - "ICM 정규화의 에피스태시스 전이 기여 (핵심 소거 미실행)"
+    - "3-공식 민감도의 교세포 전이 영향"
+    - "MC Dropout의 교세포 UQ 기여"
+
+unexpected_findings:
+  - "에피스태시스는 스펙트럼 → 이진 분류가 아닌 연속 순위 평가가 올바름"
+  - "에피스태시스가 세포유형 간에 부분 보존됨 (rho=0.444) — ICM 불변성 가정의 확장 근거"
+  - "OOD distance가 데이터셋에 따라 유효/무효 → 제거 결정"
+  - "가법성이 86% double-KO에서 우위 (110/128쌍)"
+  - "RQ3 기존 정의(잔차→에피스태시스 탐지)가 동어반복이었음 → 교세포 전이 예측으로 재정의"
+
+interpretation:
+  strengthens_claims:
+    - "에피스태시스 교세포 보존이 실제로 관측됨 (rho=0.444)"
+    - "ICM 전이가 RQ3 교세포 예측의 기반이 됨 (overlap 0.65)"
+    - "MC Dropout이 대규모 데이터에서 UQ 유효 (Replogle rho=0.660)"
+    - "AL이 교세포 에피스태시스 탐지에서 5.0x 개선"
+  weakens_claims:
+    - "에피스태시스 교세포 보존이 강하지 않음 (rho=0.444, direction agreement 59%)"
+    - "ICM 전이 개선율 직접 비교 미수행"
+  unchanged_claims:
+    - "ICM 불변성 유효 (run_04-07에서 일관 확인)"
+    - "직접 경쟁자 0개 (교세포 에피스태시스 전이 예측)"
+  new_questions:
+    - "ICM 정렬이 에피스태시스 전이를 얼마나 개선하는가? (직접 비교 필요)"
+    - "공식 선택이 교세포 에피스태시스 전이에 어떤 영향을 미치는가?"
+
+recommended_next_step:
+  decision: "loopback_to_planning"
+  rationale: "새 RQ3(교세포 에피스태시스 전이) 기반으로 실험 재설계 필요. 핵심: ICM vs no-ICM 에피스태시스 전이 소거, Precision 측정, Phase 3-6 소거실험"
+
+evidence:
+  - "run_09: RQ1 r=1.000, RQ4 5.0x, Formula agreement 76.6%"
+  - "run_10: RQ2 rho=0.660 PASS, Cross-CT rho=0.444, AL 5.0x, overlap=0.65"
+  - "run_07: ICM 전이 R2 -0.30→0.92"
+  - "run_04-06: FCR-ICM 기반 모델 검증 완료"
+uncertainty:
+  - "ICM→에피스태시스 전이 개선율 미측정 (핵심 갭)"
+  - "에피스태시스 교세포 보존 강도 (moderate)"
+  - "소거실험 미실행으로 구성요소 기여 미입증"
+human_review_needed: true

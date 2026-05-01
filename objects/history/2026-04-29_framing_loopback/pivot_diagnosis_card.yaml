@@ -1,0 +1,79 @@
+object_type: PivotDiagnosisCard
+status: active
+last_updated: "2026-04-29"
+linked_stage: analysis
+linked_run: run_10
+
+pivot_trigger:
+  description: "RQ3 순환 평가가 근본적 한계 — 잔차→에피스태시스 분해의 ground-truth가 잔차 자체와 동일 신호. 소거실험 미실행으로 구성요소 기여 미입증. Precision 미측정으로 trivial baseline 대비 개선 미확인"
+  triggered_by:
+    - "metric_invalidity"
+    - "validation_blocker"
+    - "trivial_baseline_too_strong"
+
+observed_result:
+  summary: "RQ2 PASS(Replogle rho=0.660), RQ4 PASS(5.0x AL). 단 RQ3 AUROC=1.000은 순환으로 무효, Precision 미측정, Phase 3-6 소거실험 미실행, CPA/GEARS baseline 비교 미실행"
+  technical_success: "partial"
+  novelty_success: "uncertain"
+  validation_success: "failed"
+
+root_cause_assessment:
+  likely_root_causes:
+    - cause: "RQ3 순환 평가는 프레이밍 수준 문제 — '잔차에서 에피스태시스를 탐지'와 '에피스태시스=잔차'가 동일. 분해가 성공하면 AUROC=1.0(순환), 실패하면 AUROC<0.75(실패)인 구조"
+      evidence: ["run_09: AUROC=1.0 (additive formula)은 residual_mag와 ground-truth가 동일 계산", "run_09: product-GT rho=0.62로 다른 공식에서는 62%만 복구 — 공식 선택이 결과를 결정"]
+    - cause: "소거실험 없이 Full model만 평가 → ICM/MC Dropout/3-공식 등 각 구성요소의 독립 기여를 입증 불가"
+      evidence: ["Planning 8구성(A1-B2) 중 A1만 수행", "result_card baseline_comparison.delta=null"]
+    - cause: "Precision 미측정으로 trivial baseline(Precision~0.3) 대비 개선 여부를 입증 불가 — novelty_ledger의 핵심 기여 'Precision 0.3→0.6'이 미검증"
+      evidence: ["result_card: trivial_baseline_delta.meaningful=null", "novelty_ledger: target_delta_required='Precision 0.3→0.6 이상'"]
+  unlikely_root_causes:
+    - cause: "구현 버그로 인한 순환"
+      evidence: ["run_09 v1→v3 반복 개선에서 순환 문제가 공식적으로 인지됨. 버그가 아닌 구조적 문제"]
+    - cause: "데이터셋이 너무 작아서"
+      evidence: ["Replogle 843 섭동에서도 동일한 구조적 순환. 규모가 아니라 평가 설계의 문제"]
+
+pivot_options:
+  - option: "continue"
+    pros: ["RQ2/RQ4 이미 PASS"]
+    cons: ["RQ3 순환 미해소로 strong claim 불가. reviewer 첫 공격 지점 그대로"]
+    required_condition: "순환을 해소하는 독립적 평가 방법 발견"
+  - option: "continue_with_weaker_claim"
+    pros: ["workshop paper는 가능"]
+    cons: ["trivial baseline 대비 개선 미입증 상태에서 weaker claim도 위태로움"]
+    required_condition: "Precision 측정으로 최소 0.3→0.4+ 확인"
+  - option: "additional_validation"
+    pros: ["기존 프레이밍 유지"]
+    cons: ["순환은 실험 추가로 해소되는 문제가 아님 — 구조적 한계"]
+    required_condition: "순환을 피하는 독립 ground-truth 발견"
+  - option: "loopback_to_planning"
+    pros: ["소거실험 설계 보완 가능"]
+    cons: ["RQ3 순환은 설계 문제가 아니라 프레이밍 문제. Planning 루프백만으로는 근본 해결 안 됨"]
+    required_condition: "프레이밍이 그대로 유효하다는 전제"
+  - option: "loopback_to_framing"
+    pros: ["RQ3 순환의 근본 원인(잔차=에피스태시스의 동어반복)을 프레이밍 수준에서 재검토 가능", "새로운 RQ3 정의로 순환을 구조적으로 회피 가능", "기존 RQ1/RQ2/RQ4 성과는 유지하면서 RQ3만 재설계 가능"]
+    cons: ["프레이밍 재작업 필요", "기존 run_09/10 결과의 RQ3 부분은 무효화"]
+    required_condition: "RQ3이 근본적으로 재정의되어야 한다는 합의"
+  - option: "loopback_to_literature_review"
+    pros: ["에피스태시스 탐지의 독립적 검증 방법을 문헌에서 탐색 가능"]
+    cons: ["시간 소모. 기존 문헌 리뷰에서 이미 '직접 경쟁자 0개' 확인"]
+    required_condition: "문헌에 순환 없는 평가 패러다임이 존재할 가능성"
+  - option: "stop_or_merge"
+    pros: ["RQ2/RQ4 결과로 workshop paper 가능"]
+    cons: ["RQ3 핵심 기여가 무효. '잔차→에피스태시스' 신규성이 입증 안 됨"]
+    required_condition: "RQ3를 포기할 의사"
+
+recommended_decision:
+  action: "loopback_to_framing"
+  rationale: "RQ3 순환 평가는 구조적 한계로, 추가 실험으로 해소 불가. '잔차에서 에피스태시스를 탐지'하는데 '에피스태시스=잔차'인 동어반복. RQ3을 다르게 정의하거나, RQ3를 포기하고 RQ1/RQ2/RQ4로 논문을 구성해야 함. 이 결정은 프레이밍 단계에서 내려져야 함"
+  human_confirmation_required: true
+
+evidence:
+  - "run_09: AUROC=1.0 순환 의심 — ground-truth와 동일 신호 사용"
+  - "run_09: Precision 미측정, trivial baseline 대비 개선 미확인"
+  - "run_10: OOD 무효(-0.34), MC Dropout만 유효 UQ 신호"
+  - "Planning: 소거실험 8구성 중 1개만 수행"
+  - "novelty_ledger: 핵심 기여 'Precision 0.3→0.6'이 미검증"
+uncertainty:
+  - "RQ3를 어떻게 재정의할 수 있는지"
+  - "RQ1/RQ2/RQ4만으로 publishable한 스토리를 만들 수 있는지"
+  - "순환 없는 에피스태시스 평가가 가능한지"
+human_review_needed: true

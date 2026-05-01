@@ -1,0 +1,55 @@
+object_type: ExperimentContract
+status: active
+last_updated: "2026-04-30"
+linked_stage: planning
+linked_run: run_06
+
+project: BioEval — Biologically-Grounded Evaluation for Perturbation Prediction
+
+hypotheses:
+  - id: H1
+    statement: "기존 평가 지표(MSE, R²)와 생물학적 충실도 지표(BioEval) 간에 모델 순위 불일치가 존재한다 (Kendall τ < 0.7)"
+    test: "MSE 순위 vs BioEval-Dir/BioEval-Composite 순위의 Kendall τ 계산"
+    success: "τ < 0.7 (불일치 존재)"
+    failure: "τ > 0.7 (순위 유지 — 위기 실재)"
+    note: "둘 다 발표 가능. τ < 0.5는 강한 증거(지표 아티팩트), τ > 0.7은 부정 결과(위기 실재)"
+
+  - id: H2
+    statement: "BioEval 지표가 MSE보다 downstream 생물학적 유용성(DEG 회복, AL 효율, hit prioritization)을 더 잘 예측한다"
+    test: "Spearman ρ(BioEval, downstream 과업) vs Spearman ρ(MSE, downstream 과업)"
+    success: "ρ(BioEval) > ρ(MSE) by ≥ 0.1"
+    failure: "ρ(BioEval) ≤ ρ(MSE) + 0.1"
+
+  - id: H3
+    statement: "BioEval 하에서 DL 모델이 simple baseline을 능가하는 체계가 존재한다 (특정 섭동 유형에서)"
+    test: "BioEval-Dir 기준 모델 순위에서 DL > linear인 섭동 비율"
+    success: "synergistic GI에서 DL > baseline 비율 > 30%"
+    failure: "DL > baseline 비율 < 30% (모든 체계에서)"
+    note: "부분 성공(특정 체계에서만 DL 우위)도 중요 결과"
+
+design:
+  phase_count: 4
+  phases:
+    - "Phase 1: 데이터 확보 + 모델 예측 수집 (Ahlmann-Eltze 또는 직접 학습)"
+    - "Phase 2: BioEval 지표 구현 + 기존 지표 계산"
+    - "Phase 3: 지표-순위 반전 분석 (RQ1 + RQ3)"
+    - "Phase 4: 지표-downstream 과업 상관 분석 (RQ2)"
+  models: ["Mean predictor", "Additive linear", "CPA", "GEARS", "scGPT+linear"]
+  metrics_existing: ["MSE", "R²", "Pearson", "DE overlap", "AUPRC", "PDCorr", "Shesha stability"]
+  metrics_proposed: ["BioEval-Dir", "BioEval-Cal", "BioEval-DEG", "BioEval-Composite"]
+  datasets: ["Replogle 2022", "Norman 2019", "PBMC (Zhu 2025)"]
+
+success_criteria:
+  primary: "Kendall τ(MSE, BioEval) < 0.7 — 지표 변경이 모델 비교에 영향"
+  secondary: "Spearman ρ(BioEval, downstream 과업) > Spearman ρ(MSE, downstream 과업) + 0.1"
+  either_outcome_publishable: true
+  either_outcome_rationale: "순위 반전→지표 아티팩트(높은 임팩트), 순위 유지→위기 실재(중간 임팩트, 중요 부정 결과)"
+
+failure_criteria:
+  critical_failure: "BioEval 구현 민감성으로 결과가 임계값에 의존 (S1-S4 민감도에서 불안정)"
+  partial_success: "τ=0.5-0.7 (부분 반전) — 특정 체계에서만 DL 우위. 여전히 중요 결과"
+
+preregistration_risks:
+  - risk: "Ahlmann-Eltze 예측 확보 불가 → 직접 모델 학습으로 대체"
+  - risk: "DEG 임계값이 결과 지배 → S1 임계값 스윕으로 견고성 확인"
+  - risk: "단일 아키페이처 한계 → 다수 모델 비교로 완화"

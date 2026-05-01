@@ -1,0 +1,100 @@
+object_type: ExperimentContract
+status: confirmed
+last_updated: "2026-04-29"
+linked_stage: planning
+linked_run: run_09
+
+experiment_id: "run_09"
+experiment_title: "FCR-ICM 에피스태시스 탐지 + 불확실성 정량화 + 능동학습"
+
+linked_research_question: "인과 분해된 섭동 표현(z_tx)의 조합 예측 불확실성을 정량화할 때, 잔차에서 에피스타시스를 분리하고 불확실성이 실험 우선순위를 안내할 수 있는가?"
+linked_claim: "objects/current/novelty_ledger.yaml"
+
+hypothesis:
+  primary: "FCR-ICM 잔차 분해 + 다중 신호원 UQ가 trivial baseline 대비 에피스타시스 탐지 정밀도를 개선한다"
+  secondary:
+    - "ICM 위반 점수가 불확실성 프록시로 작동한다"
+    - "3-공식 민감도 분석이 에피스타시스 정의의 견고성을 보여준다"
+    - "불확실성 기반 AL이 random 대비 에피스태시스 탐지 효율을 개선한다"
+
+design_summary:
+  dataset: "Norman 2019 (131 single + 104 double KO, K562) + Replogle 2022 (K562+RPE1)"
+  model_or_method: "FCR-ICM (VAE, z_dim=8, z_x/z_t/z_tx 분해 + ICM MMD 정규화)"
+  baseline_methods:
+    - "Trivial: 가법 잔차 = 에피스태시스"
+    - "Pacalin: 가법 합 잔차 + p<0.05"
+    - "GEARS: 학습 데이터 GI 분류"
+    - "FCR (no ICM): 소거실험"
+  trivial_baseline: "가법 잔차 = 에피스태시스 (Precision ~0.3)"
+  evaluation_metrics:
+    - "잔차 분해 정확도 (합성, r>0.7)"
+    - "U-Error Spearman rho (>0.6)"
+    - "Coverage (90% CI, 0.85-0.95)"
+    - "Epistasis AUROC (>0.75)"
+    - "Epistasis Precision (>0.6)"
+    - "Top-k recall (>2x random)"
+  split_strategy: "Leave-one-out double KO (Norman), cross-cell-type (Replogle)"
+  key_hyperparameters:
+    - "z_dim=8"
+    - "ICM MMD regularization"
+    - "MC Dropout p=0.1"
+    - "3 GI formulas (additive/multiplicative/product)"
+
+success_criteria:
+  primary:
+    metric: "U-Error Spearman rho + Epistasis AUROC"
+    threshold: "rho>0.6, AUROC>0.75"
+    rationale: "stages/02_framing.md 타겟 기준"
+  secondary:
+    - metric: "Top-k AL improvement"
+      threshold: ">2x random"
+      rationale: "RQ4 능동학습 효과"
+    - metric: "Formula agreement"
+      threshold: ">60%"
+      rationale: "공식 민감도가 치명적이지 않음을 보여야"
+
+partial_success_criteria:
+  - "AUROC 0.6-0.75: high-confidence 하위 집합으로 타겟 완화"
+  - "rho 0.4-0.6: 대규모 데이터에서 개선 가능성 확인"
+
+failure_criteria:
+  - "AUROC < 0.6: 에피스태시스 탐지 신호 없음"
+  - "Precision < 0.3: trivial baseline과 동일"
+
+outcome_interpretation:
+  if_success:
+    allowed_claim: "FCR-ICM 잔차 분해가 에피스태시스 탐지에서 trivial baseline 대비 유의미한 개선"
+    next_step: "논문 초안 작성 (Stage 05)"
+  if_partial_success:
+    allowed_claim: "제한적 조건에서 에피스태시스 탐지 유효"
+    next_step: "조건 명확화 + 추가 검증"
+  if_failure:
+    implication: "잔차→에피스태시스 분해 접근 자체의 한계"
+    loopback_target: "framing"
+
+pre_registered_risks:
+  technical_risks:
+    - "잔차 분해 식별 가능성 부족 (r_epistasis, r_model, r_noise 분해)"
+    - "RQ3 순환 평가: ground-truth와 동일 신호 사용 위험"
+  novelty_risks:
+    - "ICM 위반-에피스태시스 무관 가능성"
+  validation_risks:
+    - "Norman 규모 제한 (104 double KO)"
+    - "OOD distance 데이터셋 의존성"
+  metric_risks:
+    - "AUROC 1.000은 순환 가능성"
+    - "Precision이 여전히 낮을 가능성"
+
+user_confirmation:
+  required: true
+  confirmed: true
+  confirmation_date: "2026-04-29"
+  notes: "run_09/10 사용자 승인 완료"
+
+evidence:
+  - "stages/03_planning.md: 6-Phase 아키텍처 설계"
+  - "stages/04_analysis.md: run_04-08 기반 설계"
+uncertainty:
+  - "PORTAL 대규모 검증 미수행"
+  - "RQ3 순환 평가 해소 미완료"
+human_review_needed: false

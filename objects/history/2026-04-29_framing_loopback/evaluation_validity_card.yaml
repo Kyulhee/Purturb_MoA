@@ -1,0 +1,67 @@
+object_type: EvaluationValidityCard
+status: active
+last_updated: "2026-04-29"
+linked_stage: planning
+linked_run: run_09
+
+target_construct: "에피스태시스 탐지 능력 + 불확실성 정량화 품질"
+primary_metric: "Epistasis AUROC + U-Error Spearman rho"
+
+metric_construct_alignment:
+  alignment_level: "moderate"
+  rationale: "AUROC는 이진 분류 기준으로 에피스태시스 스펙트럼을 임계값화. rho는 연속 순위 평가로 더 적합. run_09에서 에피스태시스는 스펙트럼 확인 → rho가 더 적절한 지표"
+
+known_metric_risks:
+  proxy_mismatch:
+    present: true
+    explanation: "AUROC가 이진 분류 기준이나 에피스태시스는 연속 스펙트럼. run_09에서 이진 분류보다 연속 순위 평가가 올바름을 확인"
+  tautology_risk:
+    present: true
+    explanation: "RQ3 AUROC=1.000은 순환 가능성 — ground-truth와 동일한 신호 사용. ICM/OOD 기반 점수로 탐지하는 독립 평가 필요"
+  dataset_dependence:
+    present: true
+    explanation: "OOD distance가 Norman에서는 유효(rho=0.385), Replogle에서는 무효(-0.340). 단일 섭동만 있는 데이터에서 OOD는 조합 불확실성 프록시로 부적합"
+  threshold_subjectivity:
+    present: true
+    explanation: "에피스태시스 판정 임계값이 공식에 따라 변함 (Valenzuela 2025, Ajmal 2025). 3-공식 민감도 분석으로 완화"
+
+alternative_metrics:
+  required:
+    - "U-Error Spearman rho (연속 불확실성 정렬)"
+    - "Epistasis Precision (정밀도 중심)"
+    - "Formula agreement rate (공식 견고성)"
+  optional:
+    - "Coverage (90% CI)"
+    - "GI subtype F1 (5-class)"
+    - "Cross-CT 에피스태시스 상관 (rho)"
+
+validation_design:
+  internal_validation:
+    - "합성 데이터 잔차 분해 검증 (r>0.7 달성, run_09)"
+    - "소거실험 6구성 (run_05)"
+    - "Norman 104 double KO (run_09)"
+    - "Replogle cross-cell-type (run_10)"
+  external_validation:
+    - "PORTAL 665,856 쌍 대규모 검증 (미수행)"
+  negative_controls:
+    - "Trivial baseline: 가법 잔차 = 에피스태시스 (Precision ~0.3)"
+    - "FCR (no ICM): 소거실험"
+  sensitivity_analysis:
+    - "3-공식 민감도 (additive/multiplicative/product, 76.6% 일치)"
+    - "MC Dropout p 튜닝"
+    - "ICM 정규화 강도"
+
+decision:
+  metric_allowed_for_primary_claim: true
+  metric_allowed_only_as_supporting_evidence: null
+  required_before_analysis:
+    - "AUROC 순환 평가 해소 필요"
+    - "OOD distance 대안 마련 (Replogle에서 무효)"
+
+evidence:
+  - "run_09: AUROC=1.000 순환 의심, Formula agreement 76.6%"
+  - "run_10: MC Dropout rho=0.660 유효, OOD rho=-0.340 무효"
+uncertainty:
+  - "순환 평가 해소 방법 미확정"
+  - "PORTAL 대규모 검증 미수행"
+human_review_needed: false

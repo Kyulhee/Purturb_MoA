@@ -1,0 +1,162 @@
+object_type: ResultCard
+status: active
+last_updated: "2026-04-30"
+linked_stage: analysis
+linked_run: run_12
+
+experiment_id: "run_12"
+linked_experiment_contract: "objects/current/experiment_contract.yaml"
+
+result_summary:
+  primary_metric:
+    name: "Cross-CT 에피스태시스 rho (잔차 순위 전이) + AL 개선율"
+    value: "A7 rho=0.326, AL 2.667×"
+    threshold: "rho>0.4, AL>2×"
+    pass_fail: "PARTIAL (rho PARTIAL, AL PASS)"
+    notes: "A7 rho는 PARTIAL(0.2-0.4). prod formula rho=0.437은 PASS. AL 2.667× PASS"
+  secondary_metrics:
+    - name: "U-Error rho (MC-only)"
+      value: 0.786
+      threshold: 0.6
+      pass_fail: "pass"
+      notes: "run_10의 0.660보다 대폭 개선. MC Dropout UQ 상관관계 강함"
+    - name: "Coverage (90% CI)"
+      value: 0.293
+      threshold: "0.85-0.95"
+      pass_fail: "CRITICAL_FAIL"
+      notes: "심각한 under-coverage. 90% CI가 29.3%만 커버. MC Dropout 분산 과소"
+    - name: "AL Top-10 improvement"
+      value: 2.667
+      threshold: 2.0
+      pass_fail: "pass"
+    - name: "AL Transfer overlap"
+      value: 0.750
+      threshold: 0.5
+      pass_fail: "pass"
+    - name: "Norman Precision (top-20)"
+      value: 0.731
+      threshold: 0.6
+      pass_fail: "pass"
+      notes: "2.393× random"
+    - name: "Norman Coverage (90% CI)"
+      value: 0.235
+      threshold: "0.85-0.95"
+      pass_fail: "fail"
+      notes: "Norman도 under-coverage"
+    - name: "ICM 개선율 (add)"
+      value: 1.005
+      threshold: 1.5
+      pass_fail: "fail"
+      notes: "ICM negative result 재확인 (run_11: 0.966×)"
+    - name: "A7 잔차 순위 전이 rho"
+      value: 0.326
+      threshold: 0.4
+      pass_fail: "partial"
+      notes: "run_11(0.402)보다 저하. 데이터 파이프라인 차이 추정"
+    - name: "CPA Baseline rho_add"
+      value: 0.430
+      threshold: null
+      pass_fail: "informational"
+      notes: "FCR rho_add(0.367)보다 높음. 단순 모델이 에피스태시스 전이에 충분"
+    - name: "mean_r2 (A1 ICM)"
+      value: 0.860
+      threshold: null
+      pass_fail: "informational"
+      notes: "재구성 품질. mean_pearson=0.928"
+    - name: "R2/Pearson Cross-CT"
+      value: "src: r2=0.950, pearson=0.977 / tgt: r2=0.937, pearson=0.973"
+      threshold: null
+      pass_fail: "informational"
+      notes: "세포유형 내 재구성 품질은 높음"
+
+baseline_comparison:
+  baselines:
+    - name: "A1 (ICM + 잔차 순위 전이)"
+      metric: "Cross-CT 에피스태시스 rho_add"
+      value: 0.367
+    - name: "A2 (no-ICM + 잔차 순위 전이)"
+      metric: "Cross-CT 에피스태시스 rho_add"
+      value: 0.365
+      notes: "ICM 유무와 무관"
+    - name: "A7 (잔차 순위 전이)"
+      metric: "Cross-CT 에피스태시스 rho"
+      value: 0.326
+    - name: "A3 (single formula: prod)"
+      metric: "Cross-CT 에피스태시스 rho"
+      value: 0.437
+      notes: "prod 공식만 사용. 최고 성능"
+    - name: "A4 (trivial decomposition)"
+      metric: "Cross-CT 에피스태시스 rho"
+      value: 0.367
+      notes: "pred_err 직접 사용 = add와 동일"
+    - name: "B1 (CPA baseline)"
+      metric: "Cross-CT 에피스태시스 rho_add"
+      value: 0.430
+      notes: "FCR보다 높음. factorized decomposition이 에피스태시스 전이에 불필요"
+    - name: "Random"
+      metric: "Cross-CT 에피스태시스 rho"
+      value: 0.0
+
+ablation_summary:
+  critical_ablation_A1_vs_A2:
+    result: "ICM 정규화가 에피스태시스 전이를 개선하지 못함 (1.005×)"
+    implication: "ICM negative result 재확인. run_11(0.966×)과 일관"
+  A3_single_formula:
+    result: "add=0.367, mult=0.421, prod=0.437"
+    implication: "prod 공식이 일관 최고. 3-공식 민감도는 moderate"
+  A4_trivial_decomposition:
+    result: "rho=0.367 (add와 동일)"
+    implication: "잔차 분해가 추가 가치 없음. pred_err 자체가 충분"
+  B1_CPA_baseline:
+    result: "CPA rho_add=0.430 > FCR rho_add=0.367"
+    implication: "factorized decomposition이 에피스태시스 전이에 불필요. 보존 신호는 단순"
+  ICM_ablation_detail:
+    imp_add: 1.005
+    imp_mult: 1.008
+    imp_prod: 1.031
+    imp_r_add_mag: 0.837
+    imp_mc_var: 0.431
+    imp_composite: 0.962
+  effective_components:
+    - "에피스태시스 교세포 보존 자체 (rho 0.33-0.44, 모두 p<1e-22)"
+    - "MC Dropout UQ (rho_mc=0.786)"
+    - "AL 획득 함수 (2.5-5.0× random 개선)"
+    - "Product formula (일관 최고 rho)"
+  dispensable_components:
+    - "ICM 정규화 (에피스태시스 전이에 기여 없음)"
+    - "잔차 분해 (trivial과 동일 성능)"
+    - "3-공식 결합 (단일 prod 공식이 더 나음)"
+  harmful_components:
+    - "ICM MMD 정규화 (r_add_mag 전이에 0.837×, mc_var 전이에 0.431×)"
+
+unexpected_findings:
+  - "CPA baseline이 FCR보다 에피스태시스 전이에서 우수 (0.430 vs 0.367)"
+  - "Coverage 심각 부족 (0.293 vs 타겟 0.85-0.95). MC Dropout이 overconfident"
+  - "A7 rho가 run_11(0.402)에서 0.326으로 저하 — 데이터 파이프라인 차이"
+  - "ICM 모델의 rho_mc(0.786)가 no-ICM(0.642)보다 높음 — UQ에서는 ICM이 도움"
+  - "A2 no-ICM 모델의 mean_r2=0.952가 A1 ICM의 0.860보다 높음 — ICM이 재구성에 방해"
+
+interpretation:
+  strengthens_claims:
+    - "에피스태시스가 세포유형 간에 부분 보존됨 (prod rho=0.437 PASS, 모든 공식 p<1e-22)"
+    - "MC Dropout UQ가 오차와 강 상관 (rho_mc=0.786)"
+    - "AL이 교세포 에피스태시스 탐지에서 유효 (2.67×)"
+    - "Norman Precision이 trivial 대비 유의미 (2.4-3.0×)"
+  weakens_claims:
+    - "UQ Calibration: Coverage 0.293 — 90% CI가 신뢰할 수 없음"
+    - "A7 잔차 순위 전이가 이전보다 약함 (0.326 vs run_11의 0.402)"
+    - "CPA가 FCR보다 우수 — factorized 모델의 에피스태시스 전이 가치 의문"
+  kills_claims:
+    - "MC Dropout 90% CI가 well-calibrated이다 — 0.293으로 기각"
+  new_questions:
+    - "MC Dropout under-coverage의 원인? (dropout rate, conformal calibration 필요?)"
+    - "CPA가 FCR보다 나은 것이 에피스태시스 보존의 단순성을 지지하는가?"
+    - "Conformal prediction으로 coverage를 0.85-0.95로 교정 가능한가?"
+
+recommended_next_step:
+  decision: "partial_success"
+  rationale: "3 PASS, 1 PARTIAL, 1 FAIL. Coverage 실패가 치명적. conformal prediction 교정 후 재평가 필요"
+  options:
+    - "Coverage 수정: conformal prediction 또는 dropout rate 증가 후 재실험"
+    - "PARTIAL SUCCESS로 진행: '에피스태시스 부분 보존' 클레임은 가능하나 UQ 클레임은 불완전"
+    - "Loopback to planning: Coverage 실패 원인 분석 후 설계 수정"

@@ -1,0 +1,129 @@
+object_type: ExperimentContract
+status: draft
+last_updated: "2026-04-30"
+linked_stage: planning
+linked_run: run_05
+
+experiment_id: "run_12"
+experiment_title: "잔차 순위 교세포 에피스태시스 전이 + MC-only UQ + AL + ICM 부정적 결과"
+
+linked_research_question: "에피스태시스가 세포유형 간에 부분 보존되어, 단순 잔차 순위 전이로 새 세포유형의 에피스태시스를 예측할 수 있는가?"
+linked_claim: "objects/current/novelty_ledger.yaml"
+
+hypothesis:
+  primary: "에피스태시스가 세포유형 간에 부분 보존되어, 잔차 순위 전이로 교세포 에피스태시스를 zero-shot 예측할 수 있다"
+  secondary:
+    - "에피스태시스 교세포 보존은 생물학적 현상이며 ICM과 무관하다 (rho=0.36-0.43)"
+    - "잔차 순위 전이(A7)가 ICM z_tx 전이(A1)보다 우수하다 (run_11 확인)"
+    - "MC Dropout 기반 UQ가 대규모 perturb-seq에서 유효하다 (rho=0.660)"
+    - "불확실성 기반 AL이 교세포 에피스태시스 탐지에서 random 대비 2× 이상 개선한다"
+    - "ICM 정규화는 일반 섭동 전이에 유효하나 에피스태시스 전이에는 부정적이다 (부정적 결과)"
+
+design_summary:
+  dataset: "Replogle 2022 (K562+RPE1, 843 공유 섭동) + Norman 2019 (RQ1 보조)"
+  model_or_method: "FCR-ICM (VAE, z_dim=8, z_x/z_t/z_tx 분해 + ICM MMD 정규화) + 잔차 순위 전이"
+  baseline_methods:
+    - "우연: 랜덤 조합 순서"
+    - "ICM z_tx 전이: A7에서 확인된 부정적 baseline (A1 rho=0.356)"
+    - "비인과 전이: ICM 없이 z_tx로 전이 (A2 rho=0.369)"
+    - "CPA baseline (B1)"
+  trivial_baseline: "가법 잔차 순위 전이 (A7, rho=0.402 — 이미 run_11에서 최고)"
+  evaluation_metrics:
+    - "Cross-CT 에피스태시스 Spearman rho — 잔차 순위 (>0.4)"
+    - "Top-k overlap (에피스태시스, >2× random)"
+    - "에피스태시스 Precision (Norman, trivial 대비 >0.6)"
+    - "U-Error Spearman rho — MC-only (Replogle, >0.6)"
+    - "Coverage (90% CI, 0.85-0.95)"
+    - "AL Top-k 개선율 (교세포, >2× random)"
+    - "AL Transfer overlap (>0.5)"
+  split_strategy: "Replogle K562→RPE1 zero-shot 전이 (RPE1 완전 holdout)"
+  key_hyperparameters:
+    - "z_dim=8"
+    - "ICM MMD regularization (lambda 0.01-10.0) — 잔차 분해 질에만 영향"
+    - "MC Dropout p=0.05-0.2 — UQ 유일 신호원"
+    - "3 GI formulas (additive/multiplicative/product)"
+
+ablation_design:
+  critical_ablations:
+    - id: "A1 vs A2"
+      purpose: "ICM 정규화가 잔차 분해 질과 에피스태시스 Precision에 기여하는가"
+      metric: "Norman Precision, Coverage, rho_combined"
+    - id: "A1 vs A7 (ICM 전이)"
+      purpose: "잔차 순위 전이가 ICM z_tx 전이보다 우수한지 재확인"
+      metric: "Cross-CT 에피스태시스 rho"
+  full_ablation_matrix:
+    - "A1: Full model (ICM 포함, 잔차 순위 전이, MC UQ)"
+    - "A2: w/o ICM (비인과, 잔차 순위 전이, MC UQ)"
+    - "A3: 단일 공식 (ICM, 잔차 순위 전이, MC UQ)"
+    - "A4: Trivial 분해 (ICM, 잔차 순위 전이, MC UQ)"
+    - "A5: w/o UQ+AL (ICM, 잔차 순위 전이, no AL)"
+    - "A6: w/o AL (ICM, 잔차 순위 전이, no AL)"
+    - "A7: ICM z_tx 전이 (부정적 결과 재확인)"
+    - "B1: CPA baseline"
+
+success_criteria:
+  primary:
+    metric: "Cross-CT 에피스태시스 rho (잔차 순위 전이) + AL 개선율"
+    threshold: "rho>0.4, AL > 2× random"
+    rationale: "RQ3 핵심 지표. 이미 run_11에서 달성 (rho=0.402, AL 4-8×). 재확인 + 추가 지표 측정"
+  secondary:
+    - metric: "U-Error Spearman rho (MC-only)"
+      threshold: ">0.6"
+      rationale: "RQ2 (이미 run_10에서 0.660 PASS)"
+    - metric: "에피스태시스 Precision (Norman)"
+      threshold: ">0.6"
+      rationale: "RQ1 잔차 분해의 실용적 가치 (이미 0.60-0.75 PASS)"
+    - metric: "Coverage (90% CI)"
+      threshold: "0.85-0.95"
+      rationale: "UQ 교정도 — 미측정 항목"
+    - metric: "Top-k overlap"
+      threshold: ">2× random"
+      rationale: "RQ3 순위 일관성"
+
+partial_success_criteria:
+  - "rho 0.2-0.4: 에피스태시스 전이 신호는 있으나 타겟 미달 → moderate claim"
+  - "AL 1.5-2×: AL 효과 약함 → weak claim"
+
+failure_criteria:
+  - "rho < 0.2: 에피스태시스 교세포 보존이 우연 수준"
+  - "AL < 1.5×: AL이 교세포 에피스태시스 탐지에 무효"
+
+outcome_interpretation:
+  if_success:
+    allowed_claim: "에피스태시스가 세포유형 간에 부분 보존되어 잔차 순위 전이로 예측 가능하다. ICM은 일반 전이에 유효하나 에피스태시스 전이에는 부정적이다"
+    next_step: "논문 초안 작성 (Stage 05)"
+  if_partial_success:
+    allowed_claim: "에피스태시스가 세포유형 간에 부분 보존되나 전이 예측력이 제한적이다"
+    next_step: "PORTAL 대규모 검증으로 일반성 확인"
+  if_failure:
+    implication: "에피스태시스 교세포 보존이 너무 약하거나 불안정"
+    loopback_target: "framing"
+
+pre_registered_risks:
+  technical_risks:
+    - "에피스태시스 교세포 보존이 다른 데이터셋에서 약할 가능성"
+    - "잔차 순위 전이의 일반성이 PORTAL에서 불확실"
+    - "MC Dropout UQ의 coverage가 0.85-0.95 범위를 벗어날 가능성"
+  novelty_risks:
+    - "잔차 순위 전이가 너무 단순하여 novelty로 인정받지 못할 가능성"
+    - "ICM 부정적 결과가 논문 리뷰어에게 부정적으로 작용할 가능성"
+  validation_risks:
+    - "잔차 분해의 실데이터 검증 불가 (ground truth 없음)"
+    - "소거실험에서 ICM vs no-ICM 잔차 분해 질 차이가 미미할 가능성"
+
+user_confirmation:
+  required: true
+  confirmed: true
+  confirmation_date: "2026-04-30"
+  notes: "run_05 Planning — 사용자 승인 완료. 지표 SOTA 검증 완료 (outputs/planning/run_05/metric_validation_analysis.md). Coverage 필수 측정, R2/Pearson 함께 보고 전략 합의"
+
+evidence:
+  - "run_11: A7 잔차 순위 전이 rho=0.402 (최고), ICM 개선율 0.966× (기각), AL 4-8×, Precision 0.60-0.75"
+  - "run_10: MC Dropout rho=0.660, Cross-CT rho=0.444"
+  - "run_07: ICM 전이 R2 -0.30→0.92 (일반 전이에 유효)"
+  - "run_09: RQ1 합성 분해 r=1.000"
+uncertainty:
+  - "잔차 순위 전이의 PORTAL 일반성"
+  - "Coverage 미측정"
+  - "ICM 부정적 결과의 정확한 메커니즘"
+human_review_needed: true

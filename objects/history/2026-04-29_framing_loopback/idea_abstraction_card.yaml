@@ -1,0 +1,52 @@
+object_type: IdeaAbstractionCard
+status: active
+last_updated: "2026-04-29"
+linked_stage: literature_review
+linked_run: run_06
+
+domain_specific_idea: "Perturb-seq 조합 섭동 예측 잔차에서 에피스타시스 체계적 탐지 및 불확실성 정량화"
+
+abstract_principle:
+  statement: "예측 잔차를 구조적 신호(에피스타시스)와 오차/노이즈로 분해하면, 예측 실패에서 새로운 지식을 추출할 수 있다"
+  confidence: "medium"
+  rationale: "직접 경쟁자 0개 확인(run_06, 5개 용어 체계 감사). 단 잔차 분해의 식별 가능성은 통계적 한계 존재"
+
+equivalent_representations:
+  statistics: ["잔차 분해 (residual decomposition)", "비가법 상호작용 효과 추정"]
+  machine_learning: ["불확실성 정량화 (UQ)", "에피스타시스 탐지 (interaction detection)", "능동학습 (active learning)"]
+  xai_interpretability: ["예측 오차 해석", "잔차 구조 분석"]
+  causal_inference: ["ICM 위반 = 문맥 의존적 인과 효과", "인과 불변성 기반 잔차 원천 구분"]
+  biology_domain: ["유전자 상호작용 (epistasis)", "비가법적 유전자 조합 효과", "CRISPR 조합 섭동 분석"]
+  adjacent_domains: ["약물 조합 시너지 예측", "다중 로버스트 통계"]
+
+mandatory_search_queries:
+  within_domain: ["perturb-seq combination prediction epistasis", "CRISPR double knockout interaction detection"]
+  adjacent_domain: ["drug combination synergy residual", "active learning combinatorial perturbation"]
+  abstract_principle: ["residual decomposition interaction detection", "prediction error as signal"]
+  negative_control_queries: ["additive-only perturbation prediction", "no epistasis perturb-seq"]
+
+search_coverage:
+  domain_terms_searched: true
+  method_terms_searched: true
+  abstract_terms_searched: true
+  adjacent_domains_searched: true
+  recent_preprints_checked: true
+
+risk_flags:
+  false_zero_competitor_claim: false
+  terminology_tunnel_vision: null
+  domain_specific_repackaging: false
+
+conclusion:
+  idea_originality: "strong"
+  domain_application_novelty: "strong"
+  next_required_action: "잔차 분해 식별 가능성 합성 검증 완료, 실제 데이터 검증 진행 중"
+
+evidence:
+  - "run_06: 5개 용어 체계 검증으로 직접 경쟁자 0개 확인"
+  - "run_05: 10개 교차 도메인 참신성 스캔 완료"
+  - "stages/01_literature_review.md: 43편 심층 리뷰 완료"
+uncertainty:
+  - "잔차 분해의 통계적 식별 가능성 한계 (r_epistasis, r_model, r_noise 분해)"
+  - "공식 민감도: Valenzuela/Ajmal에 따라 GI 정의 자체가 공식에 의존"
+human_review_needed: false

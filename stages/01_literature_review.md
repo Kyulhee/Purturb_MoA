@@ -5,7 +5,8 @@
 2. 문헌 검색 및 분석 수행
 3. 산출물 → `outputs/literature_review/run_XX/`에 저장
 4. 아래 지식 업데이트 (검증된 인사이트만 통합)
-5. CLAUDE.md의 `current_stage` 업데이트
+5. `objects/current/idea_abstraction_card.yaml` 업데이트 (아이디어 추상화, 동등 표현, 검색 커버리지, 위험 플래그)
+6. CLAUDE.md의 `current_stage` 업데이트
 
 ## Done when
 - 문헌 5편 이상 리뷰 완료
@@ -17,78 +18,66 @@
 
 ## 1. 연구 배경
 
-Perturb-seq(단일 세포 해상도 섭동 프로파일링)는 20+ 신규 방법(2025-2026)에도 불구하고 두 가지 근본적 미해결 문제에 직면: (1) 조합 섭동 예측 — 단일 섭동 데이터만으로 조합 효과를 예측하는 원칙적 프레임워크 부재, (2) 교차 세포 유형 전이 — 소스 세포 유형에서 학습한 모델이 타겟 세포 유형에서 작동하지 않음.
+Perturb-seq 섭동 예측은 20+ 신규 방법(2024-2026)에도 불구하고 평가 지표의 근본적 한계에 직면: MSE/R²/Pearson은 재구성 정확도만 측정하며, 생물학적 충실도(DEG 회복, 방향 정확도, downstream 과업 성과)를 측정하지 못한다. 이것이 Ahlmann-Eltze(2025) Nature Methods의 "DL ≤ linear baseline" 위기의 근본 원인일 가능성이 높다.
 
-핵심 질문: **섭동 효과를 인과적이고 불변하는 모듈로 분해하면, 이 모듈의 조합이 타겟 세포 유형의 데이터 없이 조합 섭동 효과를 제로샷으로 예측할 수 있는가?**
+핵심 질문: **섭동 예측 평가 지표가 생물학적 충실도를 측정하지 못한다면, 생물학적 충실도를 측정하는 지표를 설계하고, 이 지표 하에서 베이스라인 위기가 해소되는가?**
 
 ## 2. SOTA
 
-### 섭동 예측 방법
-| 방법 | 접근 | 조합 예측 | 교차 세포 유형 | 비고 |
-|------|------|----------|--------------|------|
-| GEARS (Roohani et al., 2023) | GNN + GRN | 조합 학습 데이터 필수 | 명시적 미지원 | Nature Biotech |
-| CPA (Lotfollahi et al., 2023) | 조합 오토인코더 | OOD 시 DEG 0.85→0.38 | 제한적 | Mol Syst Biol |
-| SAMS-VAE (arXiv:2311.02794) | 희소 가법 메커니즘 | 가법 분해 한계 | — | 상잔 작용 불가 |
-| scDFM (arXiv:2602.07103) | 분포적 flow matching | 19.6% MSE 감소 | — | ICLR 2026 |
-| scBIG (arXiv:2602.04901) | 모듈 유도 표현 | 6.7% 개선 | — | 조합 규칙 없음 |
-| MapPFN (arXiv:2601.21092) | 인컨텍스트 학습 | 제로샷 가능 | — | 명시적 조합 구조 없음 |
-| CellOT (Mittal et al., 2023) | 신경 OT | — | 교차 환자만 | Nature Methods |
-| CFM-GP (arXiv:2508.08312) | 교차 세포 유형 flow | — | 단일 모델 | 인과 분해 없음 |
-| C3TL (arXiv:2603.13051) | 인과 맥락 전이 | — | FM과 경쟁적 | bulk 데이터 활용 |
-| **BuDDI** (Davidson et al., 2023, bioRxiv) | VAE 4-분해 + 도메인 불변성 | 분해된 잠재 조합 | 도메인 적응 | FCR-ICM과 원리 유사 |
-| **scDRP** (Sun, Stojanov, Zhang, 2025, bioRxiv) | β-VAE 분해 + 인과 최적수송 | 조합 일반화 | 인과성 기반 | Kun Zhang(인과전문가) 참여 |
-| **XTransferCDR** (Liu & Jin, 2024, arXiv:2412.19228) | 도메인 분리 인코더 + 교차 전이 | 교란 표현 교차 전이 | 교차 도메인 | 약물+유전자 섭동 |
-| **Latent Causal Diffusions** (Lorch et al., 2026, arXiv:2601.15341) | 인과 확산 + 잠재 분해 | — | — | "simple baselines 약함" 직접 언급 |
-| **STRAND** (Fu et al., 2026, arXiv:2602.10156) | 서열 조건부 수송 | — | K562/Jurkat/RPE1 | DNA 서열 조건부 |
-| **Departures** (Chi et al., 2025, arXiv:2511.13124) | Schrödinger bridge | — | — | 분포 수송 |
-| **CRADLE-VAE** (Baek et al., 2024, arXiv:2409.05484) | 역사실 추론 + artifact 분리 | — | — | artifact 분리에 초점 |
+### 평가 지표 현황
+| 지표 | 측정 대상 | 한계 | 비고 |
+|------|----------|------|------|
+| MSE/R² | 분포 매칭 | 생물학적 방향·크기 무시; mean-effect trap | 표준 |
+| Pearson | 선형 상관 | 방향 구분 불가; 아웃라이어에 민감 | 표준 |
+| DEG overlap | DEG 회복 | 이진 임계값으로 정보 손실; 방향 미포함 | CPA 평가 |
+| PDS | 분포 거리 | 거리 지표 선택에 민감 | ARC Virtual Cell Challenge |
+| AUPRC (Zhu 2025) | DEG precision-recall | DEG 식별만, 방향/보정/downstream 상관 없음 | Briefings Bioinformatics |
+| PDCorr (SCALE 2026) | 섭동 방향 상관 | 유전자 수준 분해 없음, 구현 민감성 | Cell-Eval 프레임워크 |
+| Shesha stability (Raju 2026) | 기하학적 안정성 | 단일 지표, 통합 프레임워크 없음 | magnitude와 0.75-0.97 상관 |
 
-### 인과 표현 학습 (교차 도메인)
-| 방법 | 핵심 기여 | 비고 |
+### 베이스라인 위기 증거
+| 출처 | 핵심 발견 | 비고 |
 |------|----------|------|
-| FCR (arXiv:2410.22472) | z_x/z_t/z_tx 분해 + 식별 가능성 증명 | 본 제안의 기반 |
-| IEM (arXiv:2406.14302) | 교환 가능 메커니즘 + 완화된 식별 조건 | Schölkopf group, ICLR 2025 |
-| Uhler & Zhang (arXiv:2511.04790) | 인과 구조 + 표현 학습 3-문제 프레임워크 | ICM 2026 survey |
-| Rajendran et al. (arXiv:2402.09236) | 인과 → 개념 기반 표현 학습 통합 | Schölkopf group, NeurIPS 2024 |
+| Ahlmann-Eltze (2025) Nature Methods | DL ≤ linear baseline across 7+ benchmarks | 원인 분석 없음 |
+| Csendes (2025) BMC Genomics | FM ≤ mean predictor | 낮은 섭동 특이 분산 확인 |
+| SCALE (2026) | MSE가 mean-effect trap 유발 | PDCorr+DE overlap 대안 제안 |
+| 우리 run_12 | CPA > FCR (0.430 vs 0.367) | MSE 기준 — BioEval에서 반전 가능? |
+| 우리 run_12 | prod rho=0.437 PASS vs A7 rho=0.326 PARTIAL | 지표 선택이 결론 변경 |
 
-### 평가 지표
-| 지표 | 한계 | 비고 |
-|------|------|------|
-| MSE/R2 | 분포 형태 무시 | 표준 |
-| DEG overlap | 이진 임계값으로 정보 손실 | CPA 평가 |
-| PDS | 거리 지표 선택에 민감 | ARC Virtual Cell Challenge |
-| Shesha (arXiv:2604.16642) | 크기 + 방향 일관성 분리 | 보완적 지표 |
-| scGraph (Wang et al., 2026) | 생물학적 구조 보존 평가 | Islander 문제 해결 |
+### 직접/간접 경쟁자 (5개 부분)
+| 경쟁자 | 핵심 기여 | 우리와의 차이 |
+|--------|----------|--------------|
+| Wei et al. (2026) Nature Methods | 27방법×6지표 벤치마크 | 기존 지표 사용, 새 지표 설계 없음, 순위 반전 분석 없음 |
+| Zhu et al. (2025) Briefings Bioinf | AUPRC 지표 | DEG 식별만, 방향/보정/downstream 상관 없음 |
+| SCALE/Chen et al. (2026) | Cell-Eval (PDCorr+DE overlap) | 구현 민감성 문제, 이론적 분석 없음 |
+| Shesha/Raju (2026) | 기하학적 안정성 | 단일 지표, 통합 프레임워크 없음 |
+| Csendes et al. (2025) BMC Genomics | FM ≤ mean 벤치마크 | 지표 분석 없음 |
 
 ## 3. 이론적 기반
 
-### FCR 분해 (본 제안의 핵심)
-- z_x: 세포 특이 공변량 (세포 유형, 세포 주기 등)
-- z_t: 처리 식별자 (어떤 유전자가 KO되었는가)
-- z_tx: 상호작용 효과 (처리가 이 세포에 미치는 효과)
-- 식별 가능성: block-wise identifiability (강한 가정이나 약화된 버전 존재)
+### Goodhart's law in perturbation prediction
+- 최적화 목표(평가 지표)가 모델 행동을 결정하므로, 잘못된 지표는 잘못된 모델 비교를 낳음
+- MSE 최적화 → mean prediction (안전한 평균) → 생물학적 이질성 smoothing
+- 생물학적 충실도를 측정하는 지표가 없으면 모델 비교가 무의미
 
-### ICM 원리 (Schölkopf group)
-- 인과 메커니즘은 맥락에 독립적(자율적)
-- z_tx가 진짜 인과적이면 세포 유형에 불변해야 함
-- 이론적 근거: IEM (arXiv:2406.14302)에서 교환 가능 메커니즘으로 형식화
-
-### 조합 일반화 (미해결)
-- 생물학은 종종 비조합적(상위성, 완충, 합성 치사)
-- Norman et al. (2019): CBL/CNN1 시너지 = 개별 효과로 예측 불가
-- 부분적 조합 구조: 독립 경로는 가법적, 동일 경로는 비가법적
-- scBIG: 유전자 프로그램 구조가 도움 (6.7%), 조합 규칙은 미제공
+### 3개 독립 그룹의 수렴 증거
+1. Ahlmann-Eltze: DL ≤ baseline (위기 진단)
+2. SCALE: MSE가 mean-effect trap 유발 (원인 지적)
+3. Shesha: magnitude ≠ stability (지표 분리 필요)
 
 ## 4. Gap (Framing으로 전달)
 
-1. **인과 불변성 × 조합성의 교차점 공백**: FCR은 분해된 표현 제공하나 교차 세포 유형 전이나 조합 예측에 적용하지 않음. ICM은 이론 원리이나 섭동 예측 정규화로 사용된 적 없음. 두 아이디어의 결합은 미탐색
-2. **조합 규칙의 부재**: scBIG은 모듈 구조를 보이고, MapPFN은 제로샷을 보이나, 둘 다 명시적 조합 규칙이 없음. 어떤 조합 연산(가법/곱법/학습)이 어떤 조건에서 작동하는지 특성화된 적 없음
-3. **교차 세포 유형 제로샷의 인과적 기반 부재**: CFM-GP, C3TL은 경험적 전이를 보이나 인과적 보장이 없음. ICM 불변성은 이론적 보장을 제공할 수 있음
+**Gap 2: Evaluation Metrics Don't Capture What Matters ⭐ USER SELECTED**
+
+1. **지표-생물학 상관 부재**: 기존 지표 중 어떤 것이 downstream 생물학적 유용성을 예측하는지 정량 분석 없음
+2. **생물학적 충실도 지표 설계 공백**: 유전자 수준 분해능 + 방향 인식 + 보정 분석 + 구현 견고성을 모두 갖춘 지표 부재
+3. **지표-순위 반전 분석 미수행**: 지표 교체가 모델 순위를 바꾸는지 누구도 정량 분석하지 않음 (핵심 차별화)
+4. **베이스라인 위기 원인 불명**: 지표 아티팩트인지 실재하는지 판별 불가
 
 ---
 
 ## Run 이력 (세부 내용은 outputs/literature_review/run_XX/ 참조)
-- run_01: LLM 바이오인포마틱스 10편 + 섭동 예측 6모델 리뷰
-- run_02: 대조학습/섭동예측/MoA분류 11편 리뷰
-- run_03: GNN vs tabular 14편 심층 리뷰
-- run_04 (outputs/analysis/run_04/): Perturb-seq 미해결 문제 43편 심층 리뷰 + 10개 교차 도메인 참신성 스캔
+- **run_07** (2026-04-30): BioEval 신규 프로젝트 문헌 리뷰. 5개 Gap 식별, Gap 2(평가 지표)를 사용자 선택. Ahlmann-Eltze/SCALE/Shesha/Zhu/Csendes 핵심 논문 리뷰. 5개 부분 경쟁자 확인
+- run_06 (2026-04-30): [FCR-ICM] Direction A 심층 리뷰
+- run_05 (2026-04-29): [FCR-ICM] 5개 방향 탐색
+- run_01-04 (2026-04-25~29): [FCR-ICM] 초기 문헌 리뷰

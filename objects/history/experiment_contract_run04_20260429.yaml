@@ -1,0 +1,127 @@
+object_type: ExperimentContract
+status: draft
+last_updated: "2026-04-29"
+linked_stage: planning
+linked_run: run_04
+
+experiment_id: "run_11"
+experiment_title: "FCR-ICM 교세포 에피스태시스 전이 예측 + 소거실험 + UQ"
+
+linked_research_question: "한 세포유형의 에피스태시스 패턴과 불확실성으로 새 세포유형에서 에피스태시스가 발생할 조합을 zero-shot으로 예측할 수 있는가?"
+linked_claim: "objects/current/novelty_ledger.yaml"
+
+hypothesis:
+  primary: "ICM 정렬이 교세포 에피스태시스 전이를 비인과 baseline 대비 유의미하게 개선한다"
+  secondary:
+    - "에피스태시스가 세포유형 간에 부분 보존되어 전이 예측이 가능하다 (rho > 0.4)"
+    - "ICM 정렬 z_tx 기반 전이가 가법 잔차 순위 전이보다 우수하다"
+    - "불확실성 기반 AL이 교세포 에피스태시스 탐지에서 random 대비 2× 이상 개선한다"
+    - "공식 민감도가 교세포 전이에 영향을 미치나 치명적이지 않다"
+
+design_summary:
+  dataset: "Replogle 2022 (K562+RPE1, 843 공유 섭동) + Norman 2019 (RQ1 보조)"
+  model_or_method: "FCR-ICM (VAE, z_dim=8, z_x/z_t/z_tx 분해 + ICM MMD 정규화)"
+  baseline_methods:
+    - "비인과 전이: ICM 없이 z_tx로 에피스태시스 전이 (A2)"
+    - "가법 잔차 순위 전이: 단순 잔차 크기 K562→RPE1 (A7)"
+    - "UQ 순위 전이: 불확실성 순위 전이 (A8)"
+    - "Trivial: 랜덤 조합 순서"
+    - "CPA baseline (B1), GEARS baseline (B2, 선택)"
+  trivial_baseline: "가법 잔차 순위 전이 (rho > 0 예상, ICM 없이는 음의 상관 가능)"
+  evaluation_metrics:
+    - "Cross-CT 에피스태시스 Spearman rho (>0.4)"
+    - "Top-k overlap (에피스태시스, >2× random)"
+    - "ICM 전이 개선율 (>1.5× baseline)"
+    - "U-Error Spearman rho (Replogle, >0.6)"
+    - "AL Top-k 개선율 (교세포, >2× random)"
+    - "AL Transfer overlap (>0.5)"
+    - "에피스태시스 Precision (Norman, trivial 대비 >0.6)"
+  split_strategy: "Replogle K562→RPE1 zero-shot 전이 (RPE1 완전 holdout)"
+  key_hyperparameters:
+    - "z_dim=8"
+    - "ICM MMD regularization (lambda 0.01-10.0)"
+    - "MC Dropout p=0.05-0.2"
+    - "3 GI formulas (additive/multiplicative/product)"
+
+ablation_design:
+  critical_ablations:
+    - id: "A1 vs A2"
+      purpose: "ICM 정규화가 에피스태시스 전이를 개선하는가"
+      metric: "ICM 전이 개선율 (A1 rho / A2 rho)"
+    - id: "A1 vs A7"
+      purpose: "ICM 전이가 가법 잔차 순위 전이보다 우수한가"
+      metric: "A1 rho vs A7 rho"
+  full_ablation_matrix:
+    - "A1: Full model (ICM 전이)"
+    - "A2: w/o ICM (비인과 전이)"
+    - "A3: 단일 공식"
+    - "A4: Trivial 분해"
+    - "A5: MC Dropout only"
+    - "A6: w/o AL"
+    - "A7: 잔차 순위 전이"
+    - "A8: UQ 순위 전이"
+    - "B1: CPA baseline"
+    - "B2: GEARS baseline"
+
+success_criteria:
+  primary:
+    metric: "Cross-CT 에피스태시스 rho + ICM 전이 개선율"
+    threshold: "rho>0.4, ICM 전이 > 1.5× baseline"
+    rationale: "새 RQ3의 핵심 지표. 순환 위험 없음 (ground-truth 독립)"
+  secondary:
+    - metric: "U-Error Spearman rho"
+      threshold: ">0.6"
+      rationale: "RQ2 불확실성 정량화 (Replogle에서 이미 PASS)"
+    - metric: "AL Top-k 개선율 + Transfer overlap"
+      threshold: ">2× random, overlap>0.5"
+      rationale: "RQ4 능동학습"
+    - metric: "에피스태시스 Precision"
+      threshold: ">0.6 (Norman, trivial ~0.3 대비)"
+      rationale: "잔차→에피스태시스 분해의 실용적 가치"
+
+partial_success_criteria:
+  - "rho 0.2-0.4: 에피스태시스 전이 신호는 있으나 ICM 개선이 약함 → moderate claim"
+  - "ICM 전이 개선율 < 1.5×: ICM 기여가 유의미하나 강하지 않음"
+
+failure_criteria:
+  - "rho < 0.2: 에피스태시스 교세포 보존이 우연 수준"
+  - "ICM 전이 < baseline: ICM이 에피스태시스 전이를 개선하지 못함"
+
+outcome_interpretation:
+  if_success:
+    allowed_claim: "ICM 정렬이 교세포 에피스태시스 전이를 비인과 baseline 대비 유의미하게 개선한다"
+    next_step: "논문 초안 작성 (Stage 05)"
+  if_partial_success:
+    allowed_claim: "에피스태시스가 세포유형 간에 부분 보존되나 ICM의 기여는 제한적"
+    next_step: "ICM 개선 메커니즘 분석 + 조건 명확화"
+  if_failure:
+    implication: "에피스태시스 교세포 보존이 너무 약하거나 ICM이 전이에 기여하지 못함"
+    loopback_target: "framing"
+
+pre_registered_risks:
+  technical_risks:
+    - "에피스태시스 교세포 보존이 우연 수준일 가능성 (현재 rho=0.444로 moderate)"
+    - "ICM 정렬→에피스태시스 전이 인과 경로가 간접적일 가능성"
+    - "Replogle에 조합 섭동 없어 에피스태시스 프록시(예측 오차, ICM 위반)로만 평가 가능"
+  novelty_risks:
+    - "교세포 에피스태시스 전이가 직접 경쟁자 0개이나, 결과가 약하면 novelty만으로 불충분"
+  validation_risks:
+    - "소거실험에서 ICM vs no-ICM 차이가 유의미하지 않을 가능성"
+    - "Precision 측정 결과 trivial baseline과 유의미한 차이가 없을 가능성"
+
+user_confirmation:
+  required: true
+  confirmed: true
+  confirmation_date: "2026-04-29"
+  notes: "Planning run_04 — 사용자 승인 완료"
+
+evidence:
+  - "run_10: Cross-CT 에피스태시스 rho=0.444, overlap=0.65"
+  - "run_07: ICM 전이 R2 -0.30→0.92"
+  - "run_09: RQ1 합성 분해 r=1.000, RQ2 rho=0.660, AL 5.0x"
+  - "stages/02_framing.md: 새 RQ3 정의 완료"
+uncertainty:
+  - "ICM→에피스태시스 전이 개선율 미측정"
+  - "Replogle 에피스태시스 프록시 타당성 (조합 섭동 없음)"
+  - "PORTAL 대규모 검증 미수행"
+human_review_needed: true

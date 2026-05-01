@@ -1,0 +1,55 @@
+object_type: IdeaAbstractionCard
+status: active
+last_updated: "2026-04-29"
+linked_stage: literature_review
+linked_run: run_04
+
+domain_specific_idea: "Perturb-seq 조합 섭동 예측 잔차에서 교세포 에피스태시스 전이 예측 + 불확실성 정량화 + 능동학습"
+
+abstract_principle:
+  statement: "ICM 불변성 가정(z_tx가 세포유형에 불변)의 자연스러운 확장: 에피스태시스도 세포유형 간에 부분 보존되므로, 한 세포유형의 에피스태시스 패턴으로 새 세포유형의 에피스태시스를 zero-shot 예측할 수 있다"
+  confidence: "high"
+  rationale: "run_10 예비 근거(cross-CT rho=0.444, overlap=0.65) + ICM 전이 R2 -0.30→0.92의 강력한 결과. 순환 위험 없음(ground-truth가 독립)"
+
+equivalent_representations:
+  statistics: ["잔차 분해 (residual decomposition)", "교세포 상호작용 전이 (cross-domain interaction transfer)"]
+  machine_learning: ["불확실성 정량화 (UQ)", "교세포 제로샷 예측 (cross-domain zero-shot)", "능동학습 (active learning)"]
+  xai_interpretability: ["예측 오차 해석", "잔차 구조의 교세포 보존"]
+  causal_inference: ["ICM 불변성 → 에피스태시스 보존", "인과 불변성 기반 교세포 일반화"]
+  biology_domain: ["유전자 상호작용 (epistasis)", "교세포 에피스태시스 보존", "CRISPR 조합 섭동 분석"]
+  adjacent_domains: ["약물 조합 시너지 교세포 전이", "다중 로버스트 교차 도메인 예측"]
+
+mandatory_search_queries:
+  within_domain: ["perturb-seq combination prediction epistasis", "CRISPR double knockout interaction detection", "cross-cell-type epistasis prediction"]
+  adjacent_domain: ["drug combination synergy cross-cell transfer", "active learning combinatorial perturbation"]
+  abstract_principle: ["residual decomposition interaction detection", "prediction error as signal", "invariant representation epistasis transfer"]
+  negative_control_queries: ["additive-only perturbation prediction", "no epistasis perturb-seq", "epistasis not conserved across cell types"]
+
+search_coverage:
+  domain_terms_searched: true
+  method_terms_searched: true
+  abstract_terms_searched: true
+  adjacent_domains_searched: true
+  recent_preprints_checked: true
+
+risk_flags:
+  false_zero_competitor_claim: false
+  terminology_tunnel_vision: null
+  domain_specific_repackaging: false
+
+conclusion:
+  idea_originality: "strong"
+  domain_application_novelty: "strong"
+  next_required_action: "Planning 루프백 — 새 RQ3(교세포 에피스태시스 전이) 기반 실험 설계. 소거실험 + ICM 전이 개선율 검증"
+
+evidence:
+  - "run_10: Cross-CT 에피스태시스 rho=0.444, overlap=0.65"
+  - "run_09: RQ1 합성 분해 r=1.000, Formula agreement 76.6%, AL 5.0x"
+  - "run_07: ICM 전이 R2 -0.30→0.92"
+  - "PubMed 0건 + arXiv 0건: 교세포 에피스태시스 전이 예측 직접 경쟁자 없음"
+  - "stages/01_literature_review.md: 43편 심층 리뷰 완료"
+uncertainty:
+  - "에피스태시스 교세포 보존 강도 (rho=0.444 — moderate, 강하지 않음)"
+  - "ICM 정렬→에피스태시스 전이 개선의 인과 경로 검증 미완료"
+  - "공식 민감도가 교세포 전이에 미치는 영향 미확인"
+human_review_needed: false

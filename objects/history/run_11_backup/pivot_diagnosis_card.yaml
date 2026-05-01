@@ -1,0 +1,56 @@
+object_type: PivotDiagnosisCard
+status: resolved
+last_updated: "2026-04-29"
+linked_stage: framing
+linked_run: run_04
+
+pivot_trigger:
+  description: "RQ3 순환 평가의 구조적 한계 — 잔차→에피스태시스 분해의 ground-truth가 잔차 자체와 동일 신호. 소거실험 미실행으로 구성요소 기여 미입증. Precision 미측정으로 trivial baseline 대비 개선 미확인"
+  triggered_by:
+    - "metric_invalidity"
+    - "validation_blocker"
+    - "trivial_baseline_too_strong"
+
+observed_result:
+  summary: "RQ2 PASS(Replogle rho=0.660), RQ4 PASS(5.0x AL). RQ3 AUROC=1.000은 순환으로 무효. Phase 3-6 소거실험 미실행, Precision 미측정"
+  technical_success: "partial"
+  novelty_success: "uncertain"
+  validation_success: "failed"
+
+root_cause_assessment:
+  likely_root_causes:
+    - cause: "RQ3 동어반복: 에피스태시스=잔차인데 잔차에서 에피스태시스를 탐지"
+      evidence: ["run_09: AUROC=1.0은 residual_mag와 ground-truth가 동일 계산"]
+    - cause: "소거실험 미실행으로 각 구성요소의 독립 기여 미입증"
+      evidence: ["Planning 8구성(A1-B2) 중 A1만 수행"]
+    - cause: "Precision 미측정으로 trivial baseline(Precision~0.3) 대비 개선 미확인"
+      evidence: ["result_card: trivial_baseline_delta.meaningful=null"]
+  unlikely_root_causes: []
+
+pivot_options:
+  - option: "loopback_to_framing"
+    selected: true
+    pros: ["RQ3 순환의 근본 원인 해결", "에피스태시스 교세포 전이 예측은 순환 불가능", "기존 RQ1/RQ2/RQ4 성과 유지", "run_10 예비 근거(rho=0.444) 활용"]
+    cons: ["프레이밍 재작업", "run_09/10 RQ3 결과 무효화"]
+    required_condition: "RQ3가 근본적으로 재정의되어야 한다는 합의 ✅"
+
+recommended_decision:
+  action: "loopback_to_framing"
+  rationale: "RQ3를 '교세포 에피스태시스 전이 예측'으로 재정의. 순환 위험 제로(K562→RPE1, ground-truth 독립). 직접 경쟁자 0개. 기존 RQ1/RQ2/RQ4 성과 보존"
+  human_confirmation_required: false
+  confirmation_date: "2026-04-29"
+
+resolution:
+  new_rq3: "한 세포유형에서 관측한 에피스태시스 패턴으로, 새 세포유형에서 에피스태시스가 발생할 조합을 zero-shot으로 예측할 수 있는가?"
+  key_change: "에피스태시스 탐지(detection) → 교세포 에피스태시스 전이 예측(transfer prediction)"
+  circularity_resolved: true
+  next_stage: "planning"
+
+evidence:
+  - "run_10: Cross-CT 에피스태시스 rho=0.444, overlap=0.65"
+  - "run_09: AUROC=1.0 순환 의심 → 새 RQ3로 해소"
+  - "PubMed+arXiv: 교세포 에피스태시스 전이 예측 경쟁자 0건"
+uncertainty:
+  - "에피스태시스 교세포 보존 강도 (rho=0.444 — moderate)"
+  - "ICM 전이 개선율 미측정"
+human_review_needed: false

@@ -1,0 +1,103 @@
+object_type: ResultCard
+status: active
+last_updated: "2026-04-29"
+linked_stage: analysis
+linked_run: run_10
+
+experiment_id: "run_10"
+linked_experiment_contract: "objects/current/experiment_contract.yaml"
+
+result_summary:
+  primary_metric:
+    name: "U-Error Spearman rho"
+    value: 0.660
+    threshold: 0.6
+    pass_fail: "pass"
+  secondary_metrics:
+    - name: "Epistasis AUROC (add)"
+      value: 1.000
+      threshold: 0.75
+      pass_fail: "pass_with_concern"
+      notes: "순환 평가 의심 — ground-truth와 동일 신호"
+    - name: "Formula agreement"
+      value: 0.766
+      threshold: 0.6
+      pass_fail: "pass"
+    - name: "Top-5 AL improvement"
+      value: 5.0
+      threshold: 2.0
+      pass_fail: "pass"
+    - name: "Holdout rho_mc (Norman)"
+      value: 0.401
+      threshold: 0.6
+      pass_fail: "fail"
+    - name: "OOD rho (Norman)"
+      value: 0.385
+      threshold: null
+      pass_fail: "supporting"
+    - name: "OOD rho (Replogle)"
+      value: -0.340
+      threshold: null
+      pass_fail: "fail"
+
+baseline_comparison:
+  baselines:
+    - name: "Trivial (가법 잔차=에피스태시스)"
+      metric: "Precision"
+      value: 0.3
+      notes: "Recall ~100%, Precision 낮음"
+    - name: "FCR-ICM (본 제안)"
+      metric: "Precision"
+      value: null
+      notes: "AUROC 1.000이나 순환 의심"
+  trivial_baseline_delta:
+    value: null
+    meaningful: null
+    rationale: "Precision 직접 비교 미수행. AUROC는 순환 의심으로 신뢰 어려움"
+
+ablation_summary:
+  effective_components:
+    - "ICM 정규화 (RQ1 교세포 정렬: 합성 0.50→0.97, 실제 -0.35→0.35)"
+    - "MC Dropout (Replogle rho=0.660 유효)"
+    - "3-공식 민감도 분석 (76.6% 일치)"
+    - "AL 획득 함수 (5.0x random 개선)"
+  dispensable_components:
+    - "조합 일관성 손실 (실제데이터에서 불필요, run_06)"
+  harmful_components:
+    - "Comp loss (실제데이터에서 오히려 R2 0.88→0.86 저하, run_06)"
+
+unexpected_findings:
+  - "에피스태시스는 스펙트럼 → 이진 분류가 아닌 연속 순위 평가가 올바름"
+  - "OOD distance가 데이터셋에 따라 유효/무효 (Norman: +0.385, Replogle: -0.340)"
+  - "Cross-CT 에피스태시스 부분 보존 (K562↔RPE1 rho=0.444, AL overlap 0.65)"
+  - "가법성이 86% double-KO에서 우위 (110/128쌍)"
+
+interpretation:
+  strengthens_claims:
+    - "MC Dropout이 대규모 데이터에서 UQ 유효 (Replogle rho=0.660)"
+    - "AL이 에피스태시스 탐지에서 5.0x 개선"
+    - "공식 민감도는 실제이나 치명적이지 않음 (76.6% 일치)"
+    - "Cross-CT 에피스태시스 부분 보존 → ICM이 교세포 전이에도 기여"
+  weakens_claims:
+    - "AUROC=1.000 순환 의심으로 RQ3 강클레임 불가"
+    - "OOD가 Replogle에서 무효 → 단일 섭동 데이터에서 불확실성 프록시로 부적합"
+  unchanged_claims:
+    - "ICM 불변성 유효 (run_04-07에서 일관 확인)"
+    - "직접 경쟁자 0개 (잔차→에피스태시스 분해)"
+  new_questions:
+    - "RQ3 순환 평가를 어떻게 해소할 것인가?"
+    - "OOD 대신 어떤 불확실성 프록시를 사용할 것인가?"
+
+recommended_next_step:
+  decision: "continue"
+  rationale: "RQ2 PASS (Replogle), RQ4 PASS. RQ3 순환 해소 + RQ2 OOD 대안 필요하나 핵심 결과는 긍정적. 논문 초안 작성 가능 수준"
+
+evidence:
+  - "run_09: Norman 에피스태시스+UQ — RQ4 달성(5.0x), RQ2 미달(0.401)"
+  - "run_10: Replogle 다세포유형 — RQ2 rho=0.660 PASS, MC Dropout 유효, OOD 무효"
+  - "run_04-08: FCR-ICM 기반 모델 검증 완료"
+uncertainty:
+  - "RQ3 순환 평가 해소 방법 미확정"
+  - "RQ2 OOD: Replogle에서 음의 상관. MC Dropout만 의존 가능한지"
+  - "PORTAL 대규모 검증 미수행"
+human_review_needed: true

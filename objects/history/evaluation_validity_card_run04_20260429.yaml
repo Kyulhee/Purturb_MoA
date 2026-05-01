@@ -1,0 +1,79 @@
+object_type: EvaluationValidityCard
+status: active
+last_updated: "2026-04-29"
+linked_stage: planning
+linked_run: run_04
+
+target_construct: "교세포 에피스태시스 전이 예측 능력 + 불확실성 정량화 품질"
+primary_metric: "Cross-CT 에피스태시스 Spearman rho + ICM 전이 개선율"
+
+metric_construct_alignment:
+  alignment_level: "strong"
+  rationale: "새 RQ3는 K562→RPE1 전이로 ground-truth가 예측 신호와 독립. 순환 위험 없음. rho가 연속 순위 평가로 에피스태시스 스펙트럼에 적합"
+
+known_metric_risks:
+  proxy_mismatch:
+    present: true
+    explanation: "Replogle에 조합 섭동이 없어, 에피스태시스를 예측 오차/ICM 위반 등 프록시로 측정. Norman에서 Precision 직접 측정으로 보완"
+  tautology_risk:
+    present: false
+    explanation: "K562 에피스태시스로 RPE1 에피스태시스 예측 — ground-truth(RPE1)가 예측 신호(K562)와 독립. 순환 불가능"
+  dataset_dependence:
+    present: true
+    explanation: "에피스태시스 교세포 보존이 데이터셋에 의존. Replogle에서만 측정 가능 (Norman은 단일 세포유형)"
+  threshold_subjectivity:
+    present: true
+    explanation: "에피스태시스 판정 임계값이 공식에 따라 변함. 3-공식 민감도 분석으로 완화"
+
+alternative_metrics:
+  required:
+    - "Cross-CT 에피스태시스 Spearman rho (연속 순위 평가)"
+    - "ICM 전이 개선율 (vs 비인과 baseline A2)"
+    - "Top-k overlap (에피스태시스)"
+    - "U-Error Spearman rho (Replogle)"
+  optional:
+    - "에피스태시스 Precision (Norman, trivial 대비)"
+    - "Coverage (90% CI)"
+    - "3-공식 각각 교세포 전이 rho"
+    - "AL Transfer overlap"
+    - "UQ 전이 rho (보조)"
+
+validation_design:
+  internal_validation:
+    - "합성 데이터 잔차 분해 검증 (r>0.7 달성, run_09)"
+    - "ICM vs no-ICM 에피스태시스 전이 비교 (A1 vs A2, 핵심 소거)"
+    - "ICM 전이 vs 잔차 순위 전이 비교 (A1 vs A7)"
+    - "ICM 전이 vs UQ 순위 전이 비교 (A1 vs A8)"
+    - "Replogle K562→RPE1 zero-shot 전이 (run_10 예비: rho=0.444)"
+    - "3-공식 각각 교세포 전이 rho"
+    - "Norman 에피스태시스 Precision (trivial 대비)"
+  external_validation:
+    - "PORTAL 665,856 쌍 대규모 검증 (미수행)"
+  negative_controls:
+    - "비인과 전이: ICM 없이 z_tx로 전이 (A2, 음의 상관 예상)"
+    - "가법 잔차 순위 전이: 단순 잔차 크기로 순위 전이 (A7)"
+    - "랜덤 조합 순서: 우연 수준 baseline"
+  sensitivity_analysis:
+    - "3-공식 민감도 (additive/multiplicative/product, 각각 교세포 전이 rho)"
+    - "MC Dropout p 튜닝 (0.05, 0.1, 0.2)"
+    - "ICM 정규화 강도 (lambda 0.01-10.0)"
+    - "에피스태시스 임계값 변화에 따른 Precision/Recall 곡선"
+
+decision:
+  metric_allowed_for_primary_claim: true
+  metric_allowed_only_as_supporting_evidence: null
+  required_before_analysis:
+    - "A1 vs A2 소거: ICM 전이 개선율 측정"
+    - "A1 vs A7 소거: 전이 방법 기여 측정"
+    - "Norman Precision 측정: trivial baseline 대비"
+
+evidence:
+  - "run_10: rho=0.444 순환 없는 독립 평가 확인"
+  - "run_09: AUROC=1.0 순환 문제 → 새 RQ3로 해소"
+  - "run_09: MC Dropout rho=0.660 유효, RQ1 r=1.000, AL 5.0x"
+  - "run_07: ICM 전이 R2 -0.30→0.92, z_tx 음→양 반전"
+uncertainty:
+  - "ICM 전이 개선율 미측정 (핵심 소거 A2 미실행)"
+  - "Replogle 에피스태시스 프록시 타당성"
+  - "PORTAL 대규모 검증 미수행"
+human_review_needed: true

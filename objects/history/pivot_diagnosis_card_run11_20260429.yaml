@@ -1,0 +1,59 @@
+object_type: PivotDiagnosisCard
+status: active
+last_updated: "2026-04-29"
+linked_stage: analysis
+linked_run: run_11
+
+pivot_trigger:
+  description: "ICM 정규화가 교세포 에피스태시스 전이를 개선하지 못함 (0.966×, 타겟 1.5×). A7(단순 잔차 순위 전이)이 A1(ICM 전이)보다 우수. 주 가설 기각"
+  triggered_by:
+    - "primary_hypothesis_failure"
+    - "baseline_outperforms_proposed_method"
+    - "harmful_component_identified"
+
+observed_result:
+  summary: "에피스태시스 교세포 보존은 존재(rho 0.36-0.43)하나 ICM 정규화가 전이를 개선하지 못함. A1(ICM) rho_add=0.356 < A2(no-ICM) rho_add=0.369 < A7(residual rank) rho=0.402. ICM 위반 점수는 UQ에서도 무효(weight=0.0)"
+  technical_success: "partial"
+  novelty_success: "failed"
+  validation_success: "completed_but_negative"
+
+root_cause_assessment:
+  likely_root_causes:
+    - cause: "ICM MMD 정규화가 z_tx 분포 정렬에는 유효하나, 에피스태시스 전이에는 세포유형 특이적 신호를 제거하여 부정적"
+      evidence: ["A1 rho_add=0.356 < A2 rho_add=0.369", "ICM viol 전이: ICM 모델 0.158 < no-ICM 모델 0.239"]
+    - cause: "에피스태시스 교세포 보존은 ICM 불변성이 아닌 생물학적 보존에 기인"
+      evidence: ["no-ICM 모델에서도 rho=0.37-0.43", "A7(잔차 순위)가 ICM 전이보다 우수"]
+    - cause: "ICM 위반=불확실성 해석이 무효 — ICM 위반 신호가 불확실성과 무관"
+      evidence: ["UQ 최적 weight: mc=1.0, ztx=0.0", "ICM viol 전이 rho=0.158"]
+  unlikely_root_causes:
+    - cause: "구현 버그 (두 모델이 동일 결과를 산출하지 않음 — A1≠A2로 구분됨)"
+    - cause: "랜덤 시드 문제 (모든 지표에서 일관되게 ICM이 열위)"
+
+pivot_options:
+  - option: "loopback_to_framing"
+    selected: true
+    pros: ["ICM→에피스태시스 전이 인과 경로의 근본 재검토", "긍정적 결과(에피스태시스 보존, AL, Precision)를 기반으로 가설 재구성", "ICM의 유효 역할(분포 정렬)과 무효 역할(에피스태시스 전이) 명확히 분리"]
+    cons: ["프레이밍 3차 재작업", "ICM 중심 논리 전면 수정 필요"]
+    required_condition: "에피스태시스 교세포 보존의 원천을 ICM이 아닌 다른 메커니즘으로 설명해야 함"
+
+recommended_decision:
+  action: "loopback_to_framing"
+  rationale: "실험 계약 실패 기준 트리거: 'ICM 전이 < baseline'. 주 가설 'ICM 정렬이 교세포 에피스태시스 전이를 개선한다' 기각. 긍정적 결과(에피스태시스 보존, AL, Precision)를 보존하면서 가설 재구성 필요"
+  human_confirmation_required: true
+
+preserved_insights:
+  - "에피스태시스는 교세포 간에 부분 보존됨 (rho 0.36-0.43, p<1e-26) — ICM과 무관한 생물학적 사실"
+  - "AL이 교세포 에피스태시스 탐지에서 유효 (4-8× improvement, transfer overlap 0.80)"
+  - "Norman 에피스태시스 Precision이 trivial 대비 2.0-2.5× (0.60-0.75 vs 0.30)"
+  - "MC Dropout이 UQ에서 유일한 유효 신호 (ICM 위반은 무효)"
+  - "잔차 순위 전이(A7)가 가장 간단하고 효과적인 전이 방법"
+
+evidence:
+  - "run_11: ICM 개선율 0.966× (타겟 1.5× 미달)"
+  - "run_11: A7 rho=0.402 > A1 rho_add=0.356"
+  - "run_11: UQ ICM weight=0.0, rho_combined=0.524"
+  - "run_11: Norman Precision 0.60-0.75, AL 4-8×"
+uncertainty:
+  - "ICM이 분포 정렬에는 유효(run_07: R2 -0.30→0.92)하나 에피스태시스 전이에는 무효한 이유의 정확한 메커니즘"
+  - "에피스태시스 교세포 보존의 생물학적 원천"
+human_review_needed: true
