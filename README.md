@@ -1,79 +1,97 @@
-# FCR-ICM: Factorized Causal Representations for Perturb-seq Compositionality
+# BioEval: 생물학적 충실도 기반 섭동 예측 평가 프레임워크
 
-Perturb-seq 데이터에서 인과 불변성(ICM) 원리로 제약된 인자화 표현(FCR)이 교세포 zero-shot 교란 전이를 가능하게 하는지 검증하는 연구 프로젝트입니다.
+Perturb-seq 섭동 예측에서 평가 지표(MSE/R²)가 만드는 **Mean-Effect Trap**을 진단하고, 생물학적 충실도 기반 평가 지표(BioEval)를 설계하여 "DL ≤ Baseline" 위기가 지표의 아티팩트인지 판별하는 연구 프로젝트입니다.
 
 ## 연구 질문
 
-**H1 (인과 불변성 가설):** FCR의 교란 효과 잠재 변수 z_tx를 ICM 원리로 제약하면 cell type 불변이 되고, zero-shot 교란 전이가 가능하다.
+> **"평가 지표를 생물학적 충실도 기반으로 바꾸면, 모델 순위가 어떻게 달라지는가? DL ≤ Baseline 위기가 지표의 아티팩트인지, 실재하는 현상인지 판별할 수 있는가?"**
 
-- **RQ1:** ICM이 z_tx를 cell type 불변으로 만드는가?
-- **RQ2:** 단일-KO z_tx로 조합적 예측이 가능한가? (경로간 가법, 경로내 승법)
-- **RQ3:** ICM이 zero-shot 교세포 전이를 가능하게 하는가?
+## 가설 및 결과 (run_13-20)
 
-## 현재 결과 (run_01-07)
-
-| RQ | 합성 데이터 | 실제 데이터 (Norman 2019 / Replogle 2022) |
-|----|------------|--------------------------|
-| RQ1 (불변성) | 통과 (0.50 -> 0.97) | 통과 (-0.35 -> 0.35, K562+RPE1) |
-| RQ2 (조합성) | 유전자공간 통과 (R2=0.88) | 통과 (corr=0.955, R2=0.881) |
-| RQ3 (전이) | 통과 (0.51 -> 0.96) | 통과 (R2 -0.30 -> 0.92, K562->RPE1) |
+| 가설 | 내용 | 판정 | 클레임 강도 |
+|------|------|------|-----------|
+| **H1** | MSE/R²와 BioEval-Dir은 모델을 다르게 순위 매긴다 (순위 반전) | ⭐ SUPPORTED | STRONG |
+| **H2** | BioEval 지표가 MSE보다 downstream 생물학적 유용성을 더 잘 예측한다 (domain-specific) | ⭐ SUPPORTED | MODERATE |
+| **H3** | BioEval 하에서 학습된 모델이 단순 baseline을 능가한다 | ⭐ SUPPORTED | STRONG |
 
 ### 핵심 발견
 
-1. **ICM은 불변성/전이에 확실히 유효** — 실제데이터에서도 RQ3 R2 -0.30→0.92
-2. **조합성은 유전자 공간에서 평가해야 함** — 잠재공간 R2=0.05 vs 유전자공간 R2=0.88. 디코더가 인코더 비선형성 보상
-3. **조합 일관성 손실(comp loss)이 RQ2 핵심** — 소거실험에서 RQ2-cross 0.20->0.79 개선
-4. **ICM이 인코더를 더 선형적으로 만듦** — linear R2 0.69->0.87
+1. **MSE/R² 순위 반전은 실재한다** — RPE1에서 τ(MSE, Dir_deg) = 0.232, 95% CI가 0 포함 → 두 지표가 통계적으로 독립
+2. **Mean-effect trap이 체계적 현상** — Norman에서 mean_predictor가 MSE #1이나 Dir_deg #11. DEG 비율이 낮을수록 trap 심화
+3. **BioEval은 domain-specific 이점** — Intra-DEG/Intra-magnitude 100% 통과, cross-domain 33.3%
+4. **MSE는 domain-general predictor** — ρ(-MSE, dir_discovery) = 0.88-0.96. MSE 자체가 방향 정보를 포착
+5. **학습 모델 > baseline** — 3 데이터셋 × 6 지표 ALL WIN (Ridge 기준; GEARS DL 검증 진행 중)
+
+### 데이터셋
+
+| 데이터셋 | 세포 수 | 섭동 수 | 유전자 수 | DEG 비율 |
+|----------|---------|---------|----------|---------|
+| Replogle K562 | 162,751 | 1,092 | 5,000 | 2.38% |
+| Replogle RPE1 | 162,733 | 1,543 | 5,000 | 6.50% |
+| Norman 2019 | 91,205 | 283 | 5,045 | 1.53% |
+
+## BioEval 지표 구성
+
+| 지표 | 측정 대상 | 차별점 |
+|------|----------|--------|
+| **BioEval-Dir** | 유전자×섭동 수준 방향 정확도 | 기존 PDCorr은 섭동 수준만, 본 지표는 2차원 분해 제공 |
+| **BioEval-DEG** | DEG 회복 정밀도 (AUPRC) | 방향 정보를 결합한 DEG_dir_auprc는 최초의 방향 결합 DEG 평가 |
+| **BioEval-Cal** | 효과 크기 보정 분석 | 체계적 과소/과대 예측 탐지 |
 
 ## 프로젝트 구조
 
 ```
 nexus-science-win/
 ├── CLAUDE.md                    # 프로젝트 오케스트레이터
-├── docs/                        # 단계별 가이드
-│   ├── 01_literature_review.md
-│   ├── 02_framing.md
-│   ├── 03_planning.md
-│   ├── 04_analysis.md
-│   ├── 05_interpretation.md
-│   ├── 06_git_policy.md
-│   └── 07_experiment_failure_reports.md
+├── docs/
+│   ├── research_report.md       # 연구 보고서 (전체 결과 요약)
+│   ├── 08_research_report_guide.md  # 보고서 작성 가이드
+│   └── environment.md           # 환경 정보
 ├── stages/                      # 압축된 최신 지식 (단계별)
 │   ├── 01_literature_review.md
 │   ├── 02_framing.md
 │   ├── 03_planning.md
-│   ├── 04_analysis.md
-│   └── 05_interpretation.md
+│   └── 04_analysis.md
+├── objects/current/             # 결정 상태 추적 (YAML)
+│   ├── result_card.yaml
+│   ├── validation_readiness_card.yaml
+│   ├── experiment_contract.yaml
+│   ├── evaluation_validity_card.yaml
+│   ├── idea_abstraction_card.yaml
+│   └── novelty_ledger.yaml
 └── outputs/                     # 단계별 산출물
-    ├── literature_review/
-    ├── analysis/
-    │   ├── run_01/              # NAP E2E 파이프라인
-    │   ├── run_02/              # GNN vs tabular 문헌 리뷰
-    │   ├── run_03/              # AL 실험
-    │   ├── run_04/              # Phase 1 합성 + Phase 2 실제데이터
-    │   ├── run_05/              # 소거실험 + RQ2 갭 분석
-    │   ├── run_06/              # Norman 실제데이터 소거실험
-    │   └── experiment_reports/  # 가설 실패/전환 보고서
-    └── interpretation/
+    ├── literature_review/       # run_05-07
+    ├── framing/                 # run_03-06
+    ├── planning/                # run_03-06
+    └── analysis/                # run_09-20
+        ├── run_13/              # BioEval 메트릭-순위 반전 (시뮬레이션)
+        ├── run_14/              # Phase 4 downstream 과업 상관
+        ├── run_15/              # sklearn Ridge LOO (Norman)
+        ├── run_16/              # Gene PCA Feature Ridge (K562/RPE1)
+        ├── run_17/              # Bootstrap CI (B=10,000)
+        ├── run_18/              # Scale Correction
+        ├── run_19/              # Downstream Task Independence
+        └── run_20/              # GEARS DL 모델 훈련 (진행 중)
 ```
 
 ## Run 이력
 
 | Run | 날짜 | 내용 | 결과 |
 |-----|------|------|------|
-| run_01 | 2026-04-26 | NAP E2E 파이프라인 | XGBoost R2=0.91, GNN 중복성 확인 |
-| run_02 | 2026-04-27 | GNN vs tabular 문헌 심층 리뷰 11편 | GNN 임베딩이 tabular보다 우위인 근거 부족 |
-| run_03 | 2026-04-27 | Input-space AL 실험 | AL R2=0.56 vs Random R2=0.68 — AL 실패 |
-| run_04 | 2026-04-27 | 방향 전환 + Phase 1/2 검증 | RQ1/RQ3 통과, RQ2 합성실패/실제통과 |
-| run_05 | 2026-04-27 | 소거실험 + RQ2 갭 해명 | comp_loss 핵심, 유전자공간 평가로 갭 해명 |
-| run_06 | 2026-04-27 | Norman 실제데이터 소거실험 | 모든 config R2=0.86-0.89, comp loss 불필요 |
-| run_07 | 2026-04-27 | 다세포유형 실제데이터 (K562+RPE1) | RQ1/RQ3 실제 통과: 전이 R2 -0.30→0.92 |
+| run_13 | 04-30 | BioEval 메트릭-순위 반전 (시뮬레이션 11개 모델) | H1 SUPPORTED |
+| run_14 | 04-30 | Phase 4 downstream 과업 상관 | H2 SUPPORTED (88.9%) |
+| run_15 | 04-30 | sklearn Ridge LOO (Norman) | H1+H2 실제 모델 확인. K562/RPE1 퇴화 |
+| run_16 | 05-01 | Gene PCA Feature Ridge (K562/RPE1) | H1+H2+H3 3 데이터셋 전체 확인 |
+| run_17 | 05-01 | Bootstrap CI (B=10,000) | H1+H2 통계적 견고성 확인 |
+| run_18 | 05-01 | Scale Correction | 보정 불필요 확인. Dir_deg 불변 |
+| run_19 | 05-01 | Downstream Task Independence | H2 domain-specific 확인. MSE domain-general |
+| run_20 | 05-02 | GEARS DL 모델 훈련 | 진행 중 (K562 학습 중, Norman GO graph 오류) |
 
-## 이전 방향에서의 학습 (참고용)
+## 환경
 
-- **XGBoost-only R2=0.91** — FBA는 근본적으로 tabular problem
-- **GNN 임베딩 중복** — 정적 그래프에서는 knockout mask가 충분 통계량
-- **AL 실패** — FBA가 싸고 입력 차원이 낮아 AL 이점 없음
+- **System Python 3.14**: 분석 스크립트 (run_13+), Ridge LOO, 통계
+- **ai_env (conda, Python 3.11)**: GEARS/CPA 학습, PyG 모델
+- **GPU**: RTX 4060 Ti 8GB
 
 ## 라이선스
 
