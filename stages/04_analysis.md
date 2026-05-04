@@ -115,7 +115,7 @@
 - ~~Bootstrap CI for Kendall tau~~: run_17 완료 — H1+H2 통계적 견고성 확인
 - ~~Norman logFC 스케일 보정~~: run_18 완료 — 보정 불필요 (Dir_deg 불변, downstream 과업 미개선). B3 해결
 - ~~Downstream task independence (B6)~~: run_19 완료 — H2 domain-specific. Cross-domain 33.3%, intra-DEG 100%, intra-magnitude 100%. B6 해결
-- 실제 DL 모델 예측 (GEARS, CPA) — H3 "DL > baseline" 검증용
+- ~~실제 DL 모델 예측 (GEARS, CPA) — H3 "DL > baseline" 검증용~~ → run_20 GEARS 완료. 결과: GEARS < Ridge, DL ≠ better
 
 ### run_15 실제 학습 모델 (sklearn Ridge LOO, 2026-04-30)
 
@@ -191,13 +191,23 @@
 - DEG_auprc/mag_rank은 각자 도메인에서 MSE보다 강력 — intra-domain H2 강함
 - **Revised H2**: BioEval metrics provide domain-specific predictive advantage over MSE
 
-**H3: Trained vs Baseline — 3 데이터셋 ALL WIN (corrected, oracle excluded):**
+**H3: Trained vs Baseline — 3 데이터셋 ALL WIN (corrected, oracle excluded) + GEARS DL 결과:**
 
 | 데이터셋 | Dir_deg trained | Dir_deg baseline | R2 trained | R2 baseline | 6 지표 |
 |----------|:--------------:|:----------------:|:----------:|:-----------:|:------:|
 | K562 | 0.985 | 0.606 | 0.523 | -0.013 | **ALL WIN** |
 | RPE1 | 0.989 | 0.666 | 0.652 | -0.013 | **ALL WIN** |
 | Norman | 0.986 | 0.571 | 0.643 | -0.002 | **ALL WIN** |
+
+**GEARS DL 모델 (run_20): Ridge < GEARS, DL ≠ better**
+
+| 데이터셋 | GEARS R2 | Ridge R2 | GEARS Dir_deg | Ridge Dir_deg | GEARS vs Ridge |
+|----------|:--------:|:--------:|:-------------:|:-------------:|:--------------:|
+| K562 | 0.085 | 0.610 | 0.888 | 0.988 | **0/4 승** |
+| RPE1 | 0.147 | 0.696 | 0.890 | 0.983 | **0/4 승** |
+| Norman | -0.699 | 0.896 | 0.422 | 1.000 | **0/4 승** |
+
+→ H3 정교화: model quality > model complexity. Well-trained Ridge > baselines, but poorly-trained GEARS(DL) < Ridge. BioEval이 품질 격차를 정확히 식별.
 
 **검증된 지식:**
 - **C1 RESOLVED**: Gene PCA features로 one-hot LOO 퇴화 완전 해결. K562 R2 -0.027→0.523, RPE1 -0.027→0.652
@@ -216,9 +226,9 @@
 4. ~~**실제데이터 소거실험**~~: run_06 완료
 5. **에피스태시스 탐지+UQ (run_09→run_10)**: RQ2 달성(rho=0.660), RQ4 달성 — 아래 참조
 6. **논문 초안 작성**: Stage 05로 이관
-7. ~~**BioEval 실제 모델 예측 확보**~~: run_15 Ridge LOO (Norman) 완료 — DL 모델은 별도
+7. ~~**BioEval 실제 모델 예측 확보**~~: run_15 Ridge LOO (Norman) 완료 + run_20 GEARS (DL)
 8. ~~**BioEval Phase 4 구현**: H2(downstream 과업 상관) 검증~~: run_14 완료 — H2 SUPPORTED (88.9%)
-9. ~~**H3 검증**~~: run_15 (Norman) — trained Ridge > true baselines (corrected). DL 모델은 별도
+9. ~~**H3 검증**~~: run_15 (Norman) + run_20 (GEARS DL) — Ridge > baselines, GEARS < Ridge
 
 ### run_09→10 에피스태시스+UQ 실험 (2026-04-29)
 
@@ -291,3 +301,4 @@
 - **run_17** (2026-05-01): Bootstrap CI for tau/rho — **H1+H2 통계적 견고성 확인**: B=10,000 bootstrap. H1: RPE1/Norman CI includes 0 (independence confirmed). K562 |tau(MSE,Dir_all)|=0.696<0.7. H2: dir_discovery 6/6 SIG, K562+Norman 9/9 SIG. RPE1 f1@50 1/3 SIG (DEG_auprc만). DEG_auprc이 가장 견고한 H2 지표
 - **run_18** (2026-05-01): Scale Correction (A3) — **보정 불필요**: 3가지 보정(global/per-pert/variance-match) 테스트. Dir_deg 불변(부호 기반이므로), f1@50/dir_discovery 불변(순위 보존). variance_match가 H2 gap 증가시키나 MSE 악화로 인한 인위적 효과. B3 해결 — Norman logFC scale mismatch는 무시 가능
 - **run_19** (2026-05-01): Downstream Task Independence (A4/B6) — **H2 is domain-specific**: 원래 H2 100% pass rate는 intra-domain pairs(DEG↔f1, Mag↔f1)에 의해 driven. Cross-domain(Dir↔f1)은 33.3%만 pass. MSE 자체가 dir_discovery를 rho=0.88-0.96으로 예측 — MSE는 domain-general predictor. Revised H2: BioEval metrics provide domain-specific predictive advantage. B6 해결
+- **run_20** (2026-05-04): GEARS DL 모델 학습+평가 — **GEARS < Ridge, DL ≠ better**: GEARS(GNN+attention)를 3 데이터셋에서 학습(5 epochs). K562 GEARS R2=0.085 vs Ridge 0.610; RPE1 0.147 vs 0.696; Norman -0.699 vs 0.896. GEARS vs Ridge: 0/12 승. GEARS vs mean_predictor: 11/12 승. B2 해결 — DL 모델 테스트 완료, 단 Ridge에 패배. H3 정교화: model quality > model complexity. BioEval이 이 품질 격차를 정확히 식별

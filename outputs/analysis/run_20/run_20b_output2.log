@@ -1,0 +1,365 @@
+Found local copy...
+Found local copy...
+Found local copy...
+These perturbations are not in the GO graph and their perturbation can thus not be predicted
+['RHOXF2BB+ctrl' 'LYL1+IER5L' 'ctrl+IER5L' 'KIAA1804+ctrl' 'IER5L+ctrl'
+ 'RHOXF2BB+ZBTB25' 'RHOXF2BB+SET']
+Local copy of pyg dataset is detected. Loading...
+Done!
+Local copy of split is detected. Loading...
+Simulation split test composition:
+combo_seen0:5
+combo_seen1:55
+combo_seen2:17
+unseen_single:37
+Done!
+Creating dataloaders....
+Done!
+Found local GO graph CSV...
+Start Training...
+Epoch 1 Step 1 Train Loss: 0.6153
+Epoch 1 Step 51 Train Loss: 0.5339
+Epoch 1 Step 101 Train Loss: 0.4356
+Epoch 1 Step 151 Train Loss: 0.5840
+Epoch 1 Step 201 Train Loss: 0.5011
+Epoch 1 Step 251 Train Loss: 0.5468
+Epoch 1 Step 301 Train Loss: 0.5322
+Epoch 1 Step 351 Train Loss: 0.5673
+Epoch 1 Step 401 Train Loss: 0.5399
+Epoch 1 Step 451 Train Loss: 0.5631
+Epoch 1 Step 501 Train Loss: 0.5481
+Epoch 1 Step 551 Train Loss: 0.5706
+Epoch 1 Step 601 Train Loss: 0.5866
+Epoch 1 Step 651 Train Loss: 0.5365
+Epoch 1 Step 701 Train Loss: 0.4990
+Epoch 1 Step 751 Train Loss: 0.5329
+Epoch 1 Step 801 Train Loss: 0.5563
+Epoch 1 Step 851 Train Loss: 0.5969
+Epoch 1 Step 901 Train Loss: 0.5144
+Epoch 1 Step 951 Train Loss: 0.5209
+Epoch 1 Step 1001 Train Loss: 0.5805
+Epoch 1 Step 1051 Train Loss: 0.4506
+Epoch 1 Step 1101 Train Loss: 0.4844
+Epoch 1 Step 1151 Train Loss: 0.4917
+Epoch 1 Step 1201 Train Loss: 0.5357
+Epoch 1 Step 1251 Train Loss: 0.5308
+Epoch 1 Step 1301 Train Loss: 0.5539
+Epoch 1 Step 1351 Train Loss: 0.4953
+Epoch 1 Step 1401 Train Loss: 0.6053
+Epoch 1 Step 1451 Train Loss: 0.4707
+Epoch 1: Train Overall MSE: 0.0069 Validation Overall MSE: 0.0111. 
+Train Top 20 DE MSE: 0.0816 Validation Top 20 DE MSE: 0.1434. 
+Epoch 2 Step 1 Train Loss: 0.5970
+Epoch 2 Step 51 Train Loss: 0.5368
+Epoch 2 Step 101 Train Loss: 0.5349
+Epoch 2 Step 151 Train Loss: 0.4662
+Epoch 2 Step 201 Train Loss: 0.4821
+Epoch 2 Step 251 Train Loss: 0.5366
+Epoch 2 Step 301 Train Loss: 0.6302
+Epoch 2 Step 351 Train Loss: 0.5352
+Epoch 2 Step 401 Train Loss: 0.6877
+Epoch 2 Step 451 Train Loss: 0.5204
+Epoch 2 Step 501 Train Loss: 0.6017
+Epoch 2 Step 551 Train Loss: 0.4638
+Epoch 2 Step 601 Train Loss: 0.5161
+Epoch 2 Step 651 Train Loss: 0.5564
+Epoch 2 Step 701 Train Loss: 0.5701
+Epoch 2 Step 751 Train Loss: 0.5714
+Epoch 2 Step 801 Train Loss: 0.5231
+Epoch 2 Step 851 Train Loss: 0.5824
+Epoch 2 Step 901 Train Loss: 0.5492
+Epoch 2 Step 951 Train Loss: 0.5113
+Epoch 2 Step 1001 Train Loss: 0.5090
+Epoch 2 Step 1051 Train Loss: 0.5558
+Epoch 2 Step 1101 Train Loss: 0.5041
+Epoch 2 Step 1151 Train Loss: 0.5051
+Epoch 2 Step 1201 Train Loss: 0.6420
+Epoch 2 Step 1251 Train Loss: 0.5076
+Epoch 2 Step 1301 Train Loss: 0.5844
+Epoch 2 Step 1351 Train Loss: 0.5464
+Epoch 2 Step 1401 Train Loss: 0.4892
+Epoch 2 Step 1451 Train Loss: 0.6276
+Epoch 2: Train Overall MSE: 0.0073 Validation Overall MSE: 0.0132. 
+Train Top 20 DE MSE: 0.0581 Validation Top 20 DE MSE: 0.1306. 
+Epoch 3 Step 1 Train Loss: 0.5977
+Epoch 3 Step 51 Train Loss: 0.4850
+Epoch 3 Step 101 Train Loss: 0.4801
+Epoch 3 Step 151 Train Loss: 0.5299
+Epoch 3 Step 201 Train Loss: 0.6127
+Epoch 3 Step 251 Train Loss: 0.5786
+Epoch 3 Step 301 Train Loss: 0.5197
+Epoch 3 Step 351 Train Loss: 0.5288
+Epoch 3 Step 401 Train Loss: 0.5526
+Epoch 3 Step 451 Train Loss: 0.5087
+Epoch 3 Step 501 Train Loss: 0.5685
+Epoch 3 Step 551 Train Loss: 0.5221
+Epoch 3 Step 601 Train Loss: 0.4780
+Epoch 3 Step 651 Train Loss: 0.5050
+Epoch 3 Step 701 Train Loss: 0.4975
+Epoch 3 Step 751 Train Loss: 0.5452
+Epoch 3 Step 801 Train Loss: 0.5247
+Epoch 3 Step 851 Train Loss: 0.5323
+Epoch 3 Step 901 Train Loss: 0.5019
+Epoch 3 Step 951 Train Loss: 0.5573
+Epoch 3 Step 1001 Train Loss: 0.5500
+Epoch 3 Step 1051 Train Loss: 0.5744
+Epoch 3 Step 1101 Train Loss: 0.5756
+Epoch 3 Step 1151 Train Loss: 0.5122
+Epoch 3 Step 1201 Train Loss: 0.5259
+Epoch 3 Step 1251 Train Loss: 0.5011
+Epoch 3 Step 1301 Train Loss: 0.5588
+Epoch 3 Step 1351 Train Loss: 0.5354
+Epoch 3 Step 1401 Train Loss: 0.6302
+Epoch 3 Step 1451 Train Loss: 0.4510
+Epoch 3: Train Overall MSE: 0.0059 Validation Overall MSE: 0.0121. 
+Train Top 20 DE MSE: 0.0492 Validation Top 20 DE MSE: 0.1313. 
+Epoch 4 Step 1 Train Loss: 0.5372
+Epoch 4 Step 51 Train Loss: 0.5732
+Epoch 4 Step 101 Train Loss: 0.6378
+Epoch 4 Step 151 Train Loss: 0.5833
+Epoch 4 Step 201 Train Loss: 0.5319
+Epoch 4 Step 251 Train Loss: 0.5310
+Epoch 4 Step 301 Train Loss: 0.4708
+Epoch 4 Step 351 Train Loss: 0.4922
+Epoch 4 Step 401 Train Loss: 0.5131
+Epoch 4 Step 451 Train Loss: 0.5224
+Epoch 4 Step 501 Train Loss: 0.5253
+Epoch 4 Step 551 Train Loss: 0.5784
+Epoch 4 Step 601 Train Loss: 0.4821
+Epoch 4 Step 651 Train Loss: 0.4792
+Epoch 4 Step 701 Train Loss: 0.5705
+Epoch 4 Step 751 Train Loss: 0.5491
+Epoch 4 Step 801 Train Loss: 0.5680
+Epoch 4 Step 851 Train Loss: 0.5127
+Epoch 4 Step 901 Train Loss: 0.5154
+Epoch 4 Step 951 Train Loss: 0.5375
+Epoch 4 Step 1001 Train Loss: 0.5107
+Epoch 4 Step 1051 Train Loss: 0.5348
+Epoch 4 Step 1101 Train Loss: 0.5427
+Epoch 4 Step 1151 Train Loss: 0.5158
+Epoch 4 Step 1201 Train Loss: 0.4952
+Epoch 4 Step 1251 Train Loss: 0.5144
+Epoch 4 Step 1301 Train Loss: 0.5398
+Epoch 4 Step 1351 Train Loss: 0.5718
+Epoch 4 Step 1401 Train Loss: 0.4979
+Epoch 4 Step 1451 Train Loss: 0.6004
+Epoch 4: Train Overall MSE: 0.0052 Validation Overall MSE: 0.0095. 
+Train Top 20 DE MSE: 0.0450 Validation Top 20 DE MSE: 0.1468. 
+Epoch 5 Step 1 Train Loss: 0.5456
+Epoch 5 Step 51 Train Loss: 0.5041
+Epoch 5 Step 101 Train Loss: 0.5262
+Epoch 5 Step 151 Train Loss: 0.4976
+Epoch 5 Step 201 Train Loss: 0.5432
+Epoch 5 Step 251 Train Loss: 0.5177
+Epoch 5 Step 301 Train Loss: 0.4898
+Epoch 5 Step 351 Train Loss: 0.5721
+Epoch 5 Step 401 Train Loss: 0.5085
+Epoch 5 Step 451 Train Loss: 0.5669
+Epoch 5 Step 501 Train Loss: 0.5132
+Epoch 5 Step 551 Train Loss: 0.5066
+Epoch 5 Step 601 Train Loss: 0.4608
+Epoch 5 Step 651 Train Loss: 0.4604
+Epoch 5 Step 701 Train Loss: 0.5080
+Epoch 5 Step 751 Train Loss: 0.5208
+Epoch 5 Step 801 Train Loss: 0.4897
+Epoch 5 Step 851 Train Loss: 0.4755
+Epoch 5 Step 901 Train Loss: 0.5359
+Epoch 5 Step 951 Train Loss: 0.5463
+Epoch 5 Step 1001 Train Loss: 0.5193
+Epoch 5 Step 1051 Train Loss: 0.5538
+Epoch 5 Step 1101 Train Loss: 0.6074
+Epoch 5 Step 1151 Train Loss: 0.5027
+Epoch 5 Step 1201 Train Loss: 0.4802
+Epoch 5 Step 1251 Train Loss: 0.4934
+Epoch 5 Step 1301 Train Loss: 0.5337
+Epoch 5 Step 1351 Train Loss: 0.4954
+Epoch 5 Step 1401 Train Loss: 0.4946
+Epoch 5 Step 1451 Train Loss: 0.5092
+Epoch 5: Train Overall MSE: 0.0054 Validation Overall MSE: 0.0108. 
+Train Top 20 DE MSE: 0.0424 Validation Top 20 DE MSE: 0.1506. 
+Done!
+Start Testing...
+Best performing model: Test Top 20 DE MSE: 0.1617
+Skipping deeper_analysis and non_dropout_analysis (OOM safety)
+Start doing subgroup analysis for simulation split...
+test_combo_seen0_mse: 0.009550222661346197
+test_combo_seen0_pearson: 0.9803151
+test_combo_seen0_mse_de: 0.06592970993369818
+test_combo_seen0_pearson_de: 0.7754997611045837
+test_combo_seen1_mse: 0.01174202720973302
+test_combo_seen1_pearson: 0.9757029
+test_combo_seen1_mse_de: 0.173935847052119
+test_combo_seen1_pearson_de: 0.8795150030742992
+test_combo_seen2_mse: 0.010628759833600591
+test_combo_seen2_pearson: 0.9791134
+test_combo_seen2_mse_de: 0.09393911151325002
+test_combo_seen2_pearson_de: 0.9691427
+test_unseen_single_mse: 0.006070815725252032
+test_unseen_single_pearson: 0.98667413
+test_unseen_single_mse_de: 0.1874461008260983
+test_unseen_single_pearson_de: 0.8770859386469867
+Done!
+PyTorch 2.5.1, CUDA=True
+283 perturbations, 5045 genes
+Training GEARS model on Norman...
+here1
+  [WARN] predict AHR+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ARID1A+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ARRDC3+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ATL1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict BAK1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict BCL2L11+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict BCORL1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict BPGM+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict C19orf26+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict C3orf72+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CBFA2T3+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CBL+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CDKN1A+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CDKN1B+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CDKN1C+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CEBPA+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CEBPB+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CEBPE+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CELF2+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CITED1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CKS1B+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CLDN6+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CNN1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CNNM4+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict COL1A1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict COL2A1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict CSRNP1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict DLX2+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict DUSP9+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict EGR1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ELMSAN1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ETS2+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict FEV+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict FOSB+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict FOXA1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict FOXA3+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict FOXF1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict FOXL2+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict FOXO4+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict GLB1L2+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict HES7+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict HK2+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict HNF4A+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict HOXA13+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict HOXB9+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict HOXC13+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict IER5L+ctrl: IER5L is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict IGDCC3+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict IKZF3+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict IRF1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ISL2+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict JUN+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict KIAA1804+ctrl: KIAA1804 is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict KIF18B+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict KIF2C+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict KLF1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict KMT2A+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict LHX1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict LYL1+IER5L: IER5L is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict LYL1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict MAML2+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict MAP2K3+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict MAP2K6+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict MAP4K3+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict MAP4K5+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict MAP7D1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict MAPK1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict MEIS1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict MIDN+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict NCL+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict NIT1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict OSR2+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict PLK4+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict POU3F2+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict PRDM1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict PRTG+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict PTPN1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict PTPN12+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict PTPN13+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict PTPN9+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict RHOXF2BB+SET: RHOXF2BB is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict RHOXF2BB+ZBTB25: RHOXF2BB is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict RHOXF2BB+ctrl: RHOXF2BB is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict RREB1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict RUNX1T1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict S1PR2+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict SAMD1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict SET+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict SGK1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict SLC4A1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict SLC6A9+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict SNAI1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict SPI1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict STIL+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict TBX2+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict TBX3+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict TGFBR2+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict TMSB4X+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict TP73+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict TSC22D1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict UBASH3A+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict UBASH3B+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ZBTB1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ZBTB10+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ZBTB25+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ZC3HAV1+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ZNF318+ctrl: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+BAK1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+C19orf26: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+CBFA2T3: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+CDKN1A: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+CDKN1B: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+CEBPA: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+CEBPB: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+CEBPE: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+CLDN6: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+CNN1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+COL2A1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+DLX2: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+ELMSAN1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+ETS2: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+FEV: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+FOXA1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+FOXF1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+FOXL2: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+HOXB9: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+HOXC13: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+IER5L: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+IGDCC3: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+IKZF3: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+ISL2: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+KIF2C: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+KLF1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+MAP2K6: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+MAP7D1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+MAPK1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+MEIS1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+OSR2: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+PRTG: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+PTPN12: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+PTPN9: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+RUNX1T1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+SAMD1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+SET: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+SLC38A2: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+SNAI1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+SPI1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+STIL: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+TBX2: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+TBX3: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+TGFBR2: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+UBASH3A: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+UBASH3B: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+ZBTB1: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+  [WARN] predict ctrl+ZBTB25: ctrl is not in the perturbation graph. Please select from GEARS.pert_list!
+GEARS predictions: 128/283 valid
+GEARS metrics: R2=-0.699, Dir_deg=0.422, DEG_auprc=0.183
+
+Report saved to outputs/analysis/run_20/run_20b_report.md
+Total runtime: 1515.4s
