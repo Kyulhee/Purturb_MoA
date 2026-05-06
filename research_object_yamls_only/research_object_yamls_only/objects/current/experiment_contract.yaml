@@ -1,0 +1,61 @@
+object_type: ExperimentContract
+status: draft
+last_updated: null
+linked_stage: planning
+linked_run: null
+
+experiment_id: "run_XX"
+experiment_title: "TBD"
+
+linked_research_question: "TBD"
+linked_claim: "TBD"
+
+hypothesis:
+  primary: "TBD"
+  secondary: []
+
+design_summary:
+  dataset: "TBD"
+  model_or_method: "TBD"
+  baseline_methods: []
+  trivial_baseline: "TBD"
+  evaluation_metrics: []
+  split_strategy: "TBD"
+  key_hyperparameters: []
+
+success_criteria:
+  primary:
+    metric: "TBD"
+    threshold: "TBD"
+    rationale: "TBD"
+  secondary: []
+
+partial_success_criteria: []
+failure_criteria: []
+
+outcome_interpretation:
+  if_success:
+    allowed_claim: "TBD"
+    next_step: "TBD"
+  if_partial_success:
+    allowed_claim: "TBD"
+    next_step: "TBD"
+  if_failure:
+    implication: "TBD"
+    loopback_target: "same_analysis|planning|framing|literature_review|stop"
+
+pre_registered_risks:
+  technical_risks: []
+  novelty_risks: []
+  validation_risks: []
+  metric_risks: []
+
+user_confirmation:
+  required: true
+  confirmed: false
+  confirmation_date: null
+  notes: null
+
+evidence: []
+uncertainty: []
+human_review_needed: true

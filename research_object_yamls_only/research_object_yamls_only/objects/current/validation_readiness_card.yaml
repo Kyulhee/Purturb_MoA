@@ -1,0 +1,55 @@
+object_type: ValidationReadinessCard
+status: draft
+last_updated: null
+linked_stage: analysis
+linked_run: null
+
+target_claim: "TBD"
+
+evidence_status:
+  synthetic_ground_truth:
+    available: null
+    strength: "none|weak|moderate|strong|unknown"
+    notes: "TBD"
+  real_data_internal:
+    available: null
+    strength: "none|weak|moderate|strong|unknown"
+    notes: "TBD"
+  external_ground_truth:
+    available: null
+    strength: "none|weak|moderate|strong|unknown"
+    notes: "TBD"
+  cross_dataset_replication:
+    available: null
+    strength: "none|weak|moderate|strong|unknown"
+    notes: "TBD"
+  hyperparameter_robustness:
+    available: null
+    strength: "none|weak|moderate|strong|unknown"
+    notes: "TBD"
+  architecture_robustness:
+    available: null
+    strength: "none|weak|moderate|strong|unknown"
+    notes: "TBD"
+
+blockers:
+  - blocker: "TBD"
+    severity: "low|medium|high"
+    required_action: "TBD"
+
+allowed_claim_strength:
+  current_level: "none|weak|moderate|strong|unknown"
+  rationale: "TBD"
+
+next_required_validation:
+  must_have: []
+  nice_to_have: []
+
+decision:
+  ready_for_paper_claim: null
+  ready_for_workshop_claim: null
+  ready_only_for_internal_report: null
+
+evidence: []
+uncertainty: []
+human_review_needed: true

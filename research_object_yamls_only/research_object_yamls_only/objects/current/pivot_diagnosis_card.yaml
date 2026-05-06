@@ -1,0 +1,66 @@
+object_type: PivotDiagnosisCard
+status: empty
+last_updated: null
+linked_stage: analysis
+linked_run: null
+
+pivot_trigger:
+  description: "TBD"
+  triggered_by:
+    - "technical_failure"
+    - "novelty_downgrade"
+    - "metric_invalidity"
+    - "validation_blocker"
+    - "trivial_baseline_too_strong"
+    - "user_request"
+    - "other"
+
+observed_result:
+  summary: "TBD"
+  technical_success: null
+  novelty_success: null
+  validation_success: null
+
+root_cause_assessment:
+  likely_root_causes: []
+  unlikely_root_causes: []
+  evidence: []
+
+pivot_options:
+  - option: "continue"
+    pros: []
+    cons: []
+    required_condition: "TBD"
+  - option: "continue_with_weaker_claim"
+    pros: []
+    cons: []
+    required_condition: "TBD"
+  - option: "additional_validation"
+    pros: []
+    cons: []
+    required_condition: "TBD"
+  - option: "loopback_to_planning"
+    pros: []
+    cons: []
+    required_condition: "TBD"
+  - option: "loopback_to_framing"
+    pros: []
+    cons: []
+    required_condition: "TBD"
+  - option: "loopback_to_literature_review"
+    pros: []
+    cons: []
+    required_condition: "TBD"
+  - option: "stop_or_merge"
+    pros: []
+    cons: []
+    required_condition: "TBD"
+
+recommended_decision:
+  action: "unknown"
+  rationale: "TBD"
+  human_confirmation_required: true
+
+evidence: []
+uncertainty: []
+human_review_needed: true

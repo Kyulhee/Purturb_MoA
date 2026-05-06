@@ -111,12 +111,13 @@ allowed_positioning:
     - "기존 지표(MSE/R²)와 생물학적 충실도 지표(AUPRC, BioEval) 간에 모델 순위 불일치가 존재한다"
     - "지표 선택에 따라 모델 비교 결론이 달라질 수 있다"
     - "BioEval-Dir과 BioEval-Cal이 MSE가 놓치는 예측 품질 측면을 포착한다"
+    - "BioEval 지표는 intra-domain(DEG↔f1, Mag↔gene-set)에서 MSE보다 downstream 생물학적 유용성을 더 잘 예측한다. 단, cross-domain(Dir↔gene-set)에서는 MSE가 더 나은 predictor이다 (run_19 domain decomposition으로 확인)"
   strong_claims:
     - "지표-순위 반전(Kendall τ)의 정량적 분석은 이전에 수행된 적이 없다"
     - "지표-downstream 과업 상관 분석(지표→AL/hit prioritization 예측력)은 완전 신규이다"
     - "DL≤baseline 위기가 지표 아티팩트인지 실재인지 판별하는 것은 미해결 문제이다"
 
-next_required_action: "Planning — BioEval 지표 구현, Ahlmann-Eltze 벤치마크 예측 확보/재현, 순위 반전 실험 설계"
+next_required_action: "Interpretation 완료 — 논문 작성. C2 domain-specific 한정 반영. 선택: CPA 등 추가 DL 모델 검증, Wei et al. 지표 불일치 확인"
 
 evidence:
   - "Ahlmann-Eltze (2025) Nature Methods: DL ≤ linear baseline across 7+ benchmarks"
@@ -126,9 +127,9 @@ evidence:
   - "우리 run_12: CPA>FCR (0.430 vs 0.367) + prod rho=0.437 PASS vs A7 rho=0.326 PARTIAL — 지표가 결론 변경"
   - "Csendes (2025): 현재 Perturb-Seq 벤치마크의 낮은 섭동 특이 분산 — 벤치마크 자체의 문제"
 uncertainty:
-  - "Ahlmann-Eltze 벤치마크 예측 확보 가능 여부 (코드 공개 상태)"
-  - "지표-순위 반전이 실제로 일어날지 여부 (안 일어나도 발표 가능)"
-  - "BioEval 지표의 구현 민감성 (SCALE이 Cell-Eval에서 지적한 문제)"
-  - "Wei et al. (2026) 6개 지표 중 이미 순위 불일치가 있는지 (논문 확인 필요)"
-  - "생물학적 유용성의 operational definition 합의 여부"
+  - "Ahlmann-Eltze 벤치마크 예측 확보 가능 여부 → RESOLVED: 직접 학습(Ridge+GEARS)으로 대체"
+  - "지표-순위 반전이 실제로 일어날지 여부 → RESOLVED: Norman에서 τ=0.667 REVERSAL 확인 (run_15-20)"
+  - "BioEval 지표의 구현 민감성 → PARTIALLY RESOLVED: S1 민감도 PASS, DEG 임계값 선택 영향 인정"
+  - "Wei et al. (2026) 6개 지표 중 이미 순위 불일치가 있는지 → UNRESOLVED"
+  - "생물학적 유용성의 operational definition → RESOLVED: run_19 domain decomposition으로 정의 (intra-DEG, intra-magnitude, cross-domain)"
 human_review_needed: true

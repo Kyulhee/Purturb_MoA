@@ -58,12 +58,3 @@
 4. **저장**: `outputs/analysis/experiment_reports/`에 저장
 5. **stages/ 미반영**: 보고서 내용은 stages/에 반영하지 않음 (stages/는 설계 결정과 근거만 유지)
 6. **커밋**: 사용자 요청 시 별도 커밋으로 반영
-
-## 현재 보고서 목록
-
-| # | 파일 | 내용 |
-|---|------|------|
-| 01 | `01_nap_xgboost_baseline` | GNN 임베딩 중복성 — XGB 단독이 우위 |
-| 02 | `02_active_learning_failure` | AL이 random sampling보다 열위 |
-| 03 | `03_cross_domain_novelty_scan` | 10개 도메인 스캔 → 가설 선택 과정 |
-| 04 | `04_phase1_rq2_compositionality` | RQ1/RQ3 통과, RQ2 조합성 실패 |

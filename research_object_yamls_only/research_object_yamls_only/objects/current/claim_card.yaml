@@ -1,0 +1,36 @@
+object_type: ClaimCard
+status: draft
+last_updated: null
+linked_stage: interpretation
+linked_run: null
+
+current_positioning: "TBD"
+
+claims:
+  strong_claims: []
+  moderate_claims: []
+  weak_claims: []
+  disallowed_claims: []
+
+claim_evidence_map:
+  - claim: "TBD"
+    supporting_evidence: []
+    missing_evidence: []
+    risk_flags: []
+    allowed_strength: "none|weak|moderate|strong|unknown"
+
+required_caveats: []
+
+reviewer_attack_points:
+  - attack: "TBD"
+    defense: "TBD"
+    additional_evidence_needed: "TBD"
+
+decision:
+  ready_for_abstract: null
+  ready_for_results_section: null
+  ready_only_as_limitation_or_future_work: null
+
+evidence: []
+uncertainty: []
+human_review_needed: true

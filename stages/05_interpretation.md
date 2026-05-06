@@ -55,16 +55,27 @@
 - 3개 인간 세포주 데이터셋 — 다른 생물종/조직 일반화 불확실
 
 ### 이전 연구에서 전달된 실패 원인
-| 원인 | 단계 | 전달 내용 |
-|------|------|----------|
-| Loss 불균형 (50:1) | Planning | multi-objective loss는 반드시 분리 최적화 |
-| Encoder 동결 | Planning | pretrained component fine-tuning 필수 |
-| 평가 오류 (leave-MoA-out 분류) | Framing | 평가지표는 태스크 정의와 일치해야 함 |
-| Surrogate R2 < 0 (135샘플) | Analysis | GNN+XGBoost는 샘플 수 >= 500 필요 |
-| Euler dFBA 불안정 | Analysis | stiff ODE에는 implicit solver(BDF/Radau) 필수 |
-| AL uncertainty 무효 | Analysis | 모델 R2 > 0.3 이후에만 uncertainty 기반 AL 사용 |
+| 원인 | 단계 | 유형 | 전달 내용 |
+|------|------|------|----------|
+| Loss 불균형 (50:1) | Planning | prior | multi-objective loss는 반드시 분리 최적화 |
+| Encoder 동결 | Planning | prior | pretrained component fine-tuning 필수 |
+| 평가 오류 (leave-MoA-out 분류) | Framing | prior | 평가지표는 태스크 정의와 일치해야 함 |
+| Surrogate R2 < 0 (135샘플) | Analysis | prior | GNN+XGBoost는 샘플 수 >= 500 필요 |
+| Euler dFBA 불안정 | Analysis | prior | stiff ODE에는 implicit solver(BDF/Radau) 필수 |
+| AL uncertainty 무효 | Analysis | prior | 모델 R2 > 0.3 이후에만 uncertainty 기반 AL 사용 |
+
+---
+
+## 클레임 카드 (claim_card.yaml)
+
+| ID | 가설 | 클레임 | 강도 |
+|----|------|--------|------|
+| C1 | H1 | MSE/R²와 BioEval-Dir은 섭동 예측 모델을 통계적으로 독립적으로 순위 매긴다. 순위 불일치는 모델 다양성이 확보될 때 가장 뚜렷하며, DEG 비율이 낮은 데이터셋에서 더 심화한다. | STRONG |
+| C2 | H2 | BioEval 지표는 intra-domain에서 MSE보다 downstream 생물학적 유용성을 더 잘 예측한다. Cross-domain에서는 MSE가 더 나은 predictor이다. BioEval의 가치는 domain-specific 정밀도와 해석 가능성에 있다. | MODERATE |
+| C3 | H3 | 잘 학습된 모델(Ridge)은 모든 BioEval 지표에서 baseline을 압도한다. DL 복잡도 자체가 우위를 보장하지 않는다 — GEARS(DL)는 Ridge(선형)에 전패. 이 결과 자체가 BioEval의 판별력을 검증한다. | STRONG (qualified) |
 
 ---
 
 ## Run 이력 (세부 내용은 outputs/interpretation/run_XX/ 참조)
 - **run_01** (2026-05-03): BioEval 전체 해석 리포트 — H1 STRONG, H2 MODERATE (domain-specific), H3 STRONG (qualified). GEARS < Ridge 확인. Mean-Effect Trap 기작 해석. MSE 이중성 분석.
+- **claim_card** (2026-05-04): C1(H1 STRONG), C2(H2 MODERATE domain-specific), C3(H3 STRONG qualified) 작성 완료

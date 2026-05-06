@@ -1,0 +1,101 @@
+object_type: ClaimCard
+status: active
+last_updated: "2026-05-04"
+linked_stage: interpretation
+linked_run: run_01
+linked_validation: validation_readiness_card.yaml
+
+project: BioEval — Biologically-Grounded Evaluation for Perturbation Prediction
+
+claims:
+  - id: C1
+    hypothesis: H1
+    statement: "MSE/R²와 BioEval-Dir은 섭동 예측 모델을 통계적으로 독립적으로 순위 매긴다 (순위 반전 실재). MSE 최적화 모델이 반드시 방향 정확도가 높은 것은 아니다."
+    strength: STRONG
+    scope: "3개 인간 세포주 데이터셋 (Replogle K562, Replogle RPE1, Norman 2019), 시뮬레이션+실제 학습 모델(Ridge)+DL 모델(GEARS)"
+    evidence:
+      - "run_13 simulated 11개 모델: K562 τ=0.382, RPE1 τ=0.600, Norman τ=-0.200 (ANTI-CORRELATED)"
+      - "run_15-16 real Ridge: RPE1 τ(MSE,Dir_all)=0.333 REVERSAL, K562 τ(Pearson,Dir_deg)=0.056 REVERSAL, Norman τ(Pearson,Dir_deg)=-0.167"
+      - "run_17 bootstrap B=10,000: RPE1/Norman CI includes 0 → 통계적 독립 확인"
+      - "run_20 GEARS 포함: Norman τ(MSE,Dir_deg)=0.667 REVERSAL (4 모델)"
+    caveats:
+      - "GEARS+Ridge+baselines(4 모델)에서 K562/RPE1 τ=1.0 — 순위 반전은 모델 다양성에 의존"
+      - "Norman이 가장 취약 (낮은 DEG 비율 1.53%가 Mean-Effect Trap 심화)"
+      - "순위 해상도가 모델 수(4-9개)에 제한됨"
+    permissible_formulation: "MSE와 BioEval-Dir은 섭동 예측 모델을 독립적으로 순위 매긴다. 이 순위 불일치는 모델 다양성이 확보될 때 가장 뚜렷하며, DEG 비율이 낮은 데이터셋에서 더 심화한다."
+
+  - id: C2
+    hypothesis: H2
+    statement: "BioEval 지표는 동일 도메인 내에서 MSE보다 downstream 생물학적 유용성을 더 잘 예측한다. 단, 이 이점은 domain-specific이며 cross-domain에서는 성립하지 않는다."
+    strength: MODERATE
+    scope: "3개 인간 세포주 데이터셋, Ridge+시뮬레이션 모델, intra-DEG/intra-magnitude/cross-domain 분해"
+    evidence:
+      - "run_14 simulated: 80/90 pass (88.9%)"
+      - "run_15-16 real Ridge: 15/15 pass per dataset (aggregate)"
+      - "run_19 domain decomposition: intra-DEG 9/9 (100%, gap=+0.319), intra-magnitude 6/6 (100%, gap=+0.303), cross-domain 8/24 (33.3%, gap=-0.086)"
+      - "MSE 자체가 dir_discovery를 ρ=0.88-0.96으로 예측 — MSE는 domain-general predictor"
+      - "run_17 bootstrap: DEG_auprc이 모든 데이터셋에서 유의 — 가장 견고한 H2 지표"
+    caveats:
+      - "Cross-domain H2는 33.3%만 통과 — 방향과 gene-set은 본질적 다른 신호"
+      - "H2는 domain-specific으로 한정해서 주장해야 함"
+      - "MSE가 domain-general predictor라는 발견이 H2 범위를 제한"
+    permissible_formulation: "BioEval 지표는 intra-domain에서 MSE보다 downstream 생물학적 유용성을 더 잘 예측한다(DEG_auprc↔f1@50: 100%, mag_rank↔gene-set: 100%). 그러나 cross-domain에서는 MSE가 더 나은 predictor이다. BioEval의 가치는 domain-specific 정밀도와 해석 가능성에 있다."
+
+  - id: C3
+    hypothesis: H3
+    statement: "BioEval 하에서 학습된 모델이 baseline을 능가한다. 단, 이는 모델 품질에 의존하며, 복잡도 자체가 우위를 보장하지 않는다."
+    strength: STRONG with qualification
+    scope: "3개 인간 세포주 데이터셋, Ridge(선형 학습)+GEARS(DL 학습)+baselines(mean_predictor, mean_effect)"
+    evidence:
+      - "Ridge vs baselines: 3 데이터셋 × 6 지표 = 18/18 ALL WIN"
+      - "K562: Ridge Dir_deg=0.985 vs 0.606, R²=0.523 vs -0.013"
+      - "RPE1: Ridge Dir_deg=0.989 vs 0.666, R²=0.652 vs -0.013"
+      - "Norman: Ridge Dir_deg=0.986 vs 0.571, R²=0.643 vs -0.002"
+      - "GEARS vs Ridge: 0/12 승 — DL 모델이 선형 모델에 전패"
+      - "GEARS vs mean_predictor: 11/12 승 — 순진한 baseline에는 승리"
+      - "GEARS vs mean_effect: 6/12 승 — 혼합"
+    caveats:
+      - "GEARS 5 epochs + 최소 hyperparameter — 최대 성능 미대표 가능"
+      - "단일 DL 모델(GEARS)만 테스트 — CPA 등 추가 검증 필요"
+      - "Ridge LOO는 ground truth label 직접 사용 — 정보 이점"
+      - "Norman GEARS 128/283 유효 예측 — 'ctrl+gene' 형식 비호환"
+    permissible_formulation: "잘 학습된 모델(Ridge)은 모든 BioEval 지표에서 baseline을 압도한다. 그러나 DL 복잡도 자체가 우위를 보장하지 않는다 — GEARS(DL)는 Ridge(선형)에 전패했다. 이 결과 자체가 BioEval의 판별력을 검증한다: BioEval이 모델 품질의 격차를 정확히 식별한다."
+
+key_insight: "Mean-Effect Trap: MSE가 비차별 유전자가 많은 데이터셋에서 평균 근처 예측에 보상을 주어 방향 정보를 상실시킨다. DEG 비율이 낮을수록(Norman 1.53%) Trap이 심화한다. BioEval-Dir은 부호 정확도를 직접 측정하여 이를 보정한다."
+
+failed_hypotheses: []
+
+transferred_failure_causes:
+  - cause: "Loss 불균형 (50:1)"
+    from_stage: planning
+    lesson: "multi-objective loss는 반드시 분리 최적화"
+  - cause: "Encoder 동결"
+    from_stage: planning
+    lesson: "pretrained component fine-tuning 필수"
+  - cause: "평가 오류 (leave-MoA-out 분류)"
+    from_stage: framing
+    lesson: "평가지표는 태스크 정의와 일치해야 함"
+  - cause: "Surrogate R² < 0 (135샘플)"
+    from_stage: analysis
+    lesson: "GNN+XGBoost는 샘플 수 >= 500 필요"
+  - cause: "Euler dFBA 불안정"
+    from_stage: analysis
+    lesson: "stiff ODE에는 implicit solver(BDF/Radau) 필수"
+  - cause: "AL uncertainty 무효"
+    from_stage: analysis
+    lesson: "모델 R² > 0.3 이후에만 uncertainty 기반 AL 사용"
+
+limitations:
+  - "모델 수 제한 (4-9개) → 순위 해상도 제한. GEARS 포함 시 K562/RPE1 τ=1.0"
+  - "GEARS 5 epochs + 최소 hyperparameter — 최대 성능 미대표 가능"
+  - "단일 DL 모델(GEARS) — CPA 등 추가 검증 필요"
+  - "3개 인간 세포주 데이터셋 — 다른 생물종/조직 일반화 불확실"
+  - "DEG 임계값 |logFC|>0.25 — S1 민감도 PASS하나 기준 선택이 결과에 영향 가능"
+  - "Ridge LOO가 ground truth label 직접 사용 — 정보 이점 존재"
+
+future_directions:
+  - "CPA 등 추가 DL 모델 검증으로 H3 일반성 확보"
+  - "Foundation model (Geneformer, scGPT) 예측 포함 → 모델 다양성 확대"
+  - "BioEval-Dir을 loss function에 통합한 모델 학습"
+  - "비인간 종(yeast, mouse) 데이터셋에서 검증"
+  - "CRISPR screen 데이터와의 교차 검증"

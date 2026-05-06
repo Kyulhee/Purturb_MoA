@@ -1,0 +1,45 @@
+object_type: EvaluationValidityCard
+status: draft
+last_updated: null
+linked_stage: planning
+linked_run: null
+
+target_construct: "TBD"
+primary_metric: "TBD"
+
+metric_construct_alignment:
+  alignment_level: "unknown|weak|moderate|strong"
+  rationale: "TBD"
+
+known_metric_risks:
+  proxy_mismatch:
+    present: null
+    explanation: "TBD"
+  tautology_risk:
+    present: null
+    explanation: "TBD"
+  dataset_dependence:
+    present: null
+    explanation: "TBD"
+  threshold_subjectivity:
+    present: null
+    explanation: "TBD"
+
+alternative_metrics:
+  required: []
+  optional: []
+
+validation_design:
+  internal_validation: []
+  external_validation: []
+  negative_controls: []
+  sensitivity_analysis: []
+
+decision:
+  metric_allowed_for_primary_claim: null
+  metric_allowed_only_as_supporting_evidence: null
+  required_before_analysis: []
+
+evidence: []
+uncertainty: []
+human_review_needed: true

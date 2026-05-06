@@ -1,0 +1,31 @@
+# Environment — 프로젝트 환경 정보
+# Planning 진입 시 작성, 환경 변경 시 업데이트
+
+runtime:
+  - name: system_python
+    path: "C:\\Users\\hgh97\\AppData\\Local\\Python\\pythoncore-3.14-64\\"
+    version: "3.14.4"
+    usage: 분석 스크립트, 통계, 데이터 처리
+    cuda: true
+    cuda_version: "12.x (cu128)"
+    gpu: "RTX 4060 Ti 8GB"
+    key_packages: [numpy, scipy, sklearn, scanpy, pandas, torch 2.11.0+cu128]
+
+  - name: ai_env
+    path: "C:\\Users\\hgh97\\miniconda3\\envs\\ai_env\\"
+    version: "3.11.15"
+    usage: GEARS/CPA 학습, PyG 의존 모델
+    cuda: true
+    cuda_version: "12.x"
+    gpu: "RTX 4060 Ti 8GB"
+    key_packages: [torch 2.5.1, PyG 2.7.0, scanpy 1.11.5, anndata, sklearn, scipy, numpy]
+
+invocation:
+  system_python: "python script.py"
+  ai_env: "\"C:/Users/hgh97/miniconda3/envs/ai_env/python.exe\" script.py"
+
+data_locations:
+  GEARS_benchmark: "outputs/analysis/run_04/data/gears_data/"
+
+hardware:
+  gpu: "NVIDIA GeForce RTX 4060 Ti, 8188 MiB VRAM"

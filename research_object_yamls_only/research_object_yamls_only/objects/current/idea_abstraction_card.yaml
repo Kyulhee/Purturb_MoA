@@ -1,0 +1,47 @@
+object_type: IdeaAbstractionCard
+status: draft
+last_updated: null
+linked_stage: literature_review
+linked_run: null
+
+domain_specific_idea: "TBD"
+
+abstract_principle:
+  statement: "TBD"
+  confidence: "low|medium|high|unknown"
+  rationale: "TBD"
+
+equivalent_representations:
+  statistics: []
+  machine_learning: []
+  xai_interpretability: []
+  causal_inference: []
+  biology_domain: []
+  adjacent_domains: []
+
+mandatory_search_queries:
+  within_domain: []
+  adjacent_domain: []
+  abstract_principle: []
+  negative_control_queries: []
+
+search_coverage:
+  domain_terms_searched: false
+  method_terms_searched: false
+  abstract_terms_searched: false
+  adjacent_domains_searched: false
+  recent_preprints_checked: false
+
+risk_flags:
+  false_zero_competitor_claim: null
+  terminology_tunnel_vision: null
+  domain_specific_repackaging: null
+
+conclusion:
+  idea_originality: "unknown"
+  domain_application_novelty: "unknown"
+  next_required_action: "TBD"
+
+evidence: []
+uncertainty: []
+human_review_needed: true

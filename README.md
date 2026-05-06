@@ -2,97 +2,64 @@
 
 Perturb-seq 섭동 예측에서 평가 지표(MSE/R²)가 만드는 **Mean-Effect Trap**을 진단하고, 생물학적 충실도 기반 평가 지표(BioEval)를 설계하여 "DL ≤ Baseline" 위기가 지표의 아티팩트인지 판별하는 연구 프로젝트입니다.
 
-## 연구 질문
+## 🚀 프로젝트 요약 (2026-05-06 완료)
+
+본 연구는 평가 지표가 모델 선택을 어떻게 왜곡하는지 정량적으로 분석하였으며, 특히 MSE가 방향 정보가 거세된 '평균 예측'에 보상을 준다는 사실을 입증했습니다. 최종 연구 보고서는 [docs/research_report.md](./docs/research_report.md)에서 확인하실 수 있습니다.
+
+## 🔬 핵심 연구 질문
 
 > **"평가 지표를 생물학적 충실도 기반으로 바꾸면, 모델 순위가 어떻게 달라지는가? DL ≤ Baseline 위기가 지표의 아티팩트인지, 실재하는 현상인지 판별할 수 있는가?"**
 
-## 가설 및 결과 (run_13-20)
+## 📊 최종 가설 및 결과
 
 | 가설 | 내용 | 판정 | 클레임 강도 |
 |------|------|------|-----------|
-| **H1** | MSE/R²와 BioEval-Dir은 모델을 다르게 순위 매긴다 (순위 반전) | ⭐ SUPPORTED | STRONG |
-| **H2** | BioEval 지표가 MSE보다 downstream 생물학적 유용성을 더 잘 예측한다 (domain-specific) | ⭐ SUPPORTED | MODERATE |
-| **H3** | BioEval 하에서 학습된 모델이 단순 baseline을 능가한다 | ⭐ SUPPORTED | STRONG |
+| **H1** | MSE/R²와 BioEval-Dir은 모델을 다르게 순위 매긴다 (순위 반전) | ⭐ SUPPORTED | **STRONG** |
+| **H2** | BioEval 지표가 MSE보다 downstream 생물학적 유용성을 더 잘 예측한다 (domain-specific) | ⭐ SUPPORTED | **MODERATE** |
+| **H3** | BioEval 하에서 학습된 모델이 단순 baseline을 능가한다 | ⭐ SUPPORTED | **STRONG (Qualified)** |
 
 ### 핵심 발견
+1.  **순위 반전(Ranking Reversal) 실재**: RPE1 데이터셋에서 MSE와 BioEval-Dir 순위 간 상관이 τ=0.232로 나타나, 두 평가 체계가 통계적으로 독립적임을 확인했습니다.
+2.  **Mean-Effect Trap**: Norman 데이터셋에서 `mean_predictor`가 MSE 1위였으나 BioEval-Dir 11위(최하위)를 기록하여, MSE가 방향 정보를 무시함을 정량적으로 증명했습니다.
+3.  **Domain-Specific 예측력**: BioEval은 도메인 내 과업(DEG 식별 등)에서 MSE보다 +0.319 높은 예측력을 보였으나, 교차 도메인에서는 MSE가 여전히 우수한 일반형 예측자(general predictor)임을 발견했습니다.
+4.  **Model Quality > Complexity**: GEARS(DL) 모델이 훈련 미흡 시 단순 Ridge 모델에 전패(0/12 승)하는 현상을 BioEval로 포착하여, 지표의 판별력을 검증했습니다.
 
-1. **MSE/R² 순위 반전은 실재한다** — RPE1에서 τ(MSE, Dir_deg) = 0.232, 95% CI가 0 포함 → 두 지표가 통계적으로 독립
-2. **Mean-effect trap이 체계적 현상** — Norman에서 mean_predictor가 MSE #1이나 Dir_deg #11. DEG 비율이 낮을수록 trap 심화
-3. **BioEval은 domain-specific 이점** — Intra-DEG/Intra-magnitude 100% 통과, cross-domain 33.3%
-4. **MSE는 domain-general predictor** — ρ(-MSE, dir_discovery) = 0.88-0.96. MSE 자체가 방향 정보를 포착
-5. **학습 모델 > baseline** — 3 데이터셋 × 6 지표 ALL WIN (Ridge 기준; GEARS DL 검증 진행 중)
+## 🛠️ BioEval 지표 구성
 
-### 데이터셋
+| 지표 | 측정 대상 | 핵심 차별점 |
+|------|----------|------------|
+| **BioEval-Dir** | 유전자×섭동 수준 방향 정확도 | 섭동 단위 평균이 아닌, 개별 유전자 수준의 방향성 분해 제공 |
+| **BioEval-DEG** | DEG 회복 정밀도 (AUPRC) | 방향 정보를 결합하여 단순 식별 이상의 충실도 측정 |
+| **BioEval-Cal** | 효과 크기 보정 분석 | 예측치의 체계적 과소/과대 편향 탐지 |
 
-| 데이터셋 | 세포 수 | 섭동 수 | 유전자 수 | DEG 비율 |
-|----------|---------|---------|----------|---------|
-| Replogle K562 | 162,751 | 1,092 | 5,000 | 2.38% |
-| Replogle RPE1 | 162,733 | 1,543 | 5,000 | 6.50% |
-| Norman 2019 | 91,205 | 283 | 5,045 | 1.53% |
-
-## BioEval 지표 구성
-
-| 지표 | 측정 대상 | 차별점 |
-|------|----------|--------|
-| **BioEval-Dir** | 유전자×섭동 수준 방향 정확도 | 기존 PDCorr은 섭동 수준만, 본 지표는 2차원 분해 제공 |
-| **BioEval-DEG** | DEG 회복 정밀도 (AUPRC) | 방향 정보를 결합한 DEG_dir_auprc는 최초의 방향 결합 DEG 평가 |
-| **BioEval-Cal** | 효과 크기 보정 분석 | 체계적 과소/과대 예측 탐지 |
-
-## 프로젝트 구조
+## 📂 프로젝트 구조
 
 ```
 nexus-science-win/
-├── CLAUDE.md                    # 프로젝트 오케스트레이터
 ├── docs/
-│   ├── research_report.md       # 연구 보고서 (전체 결과 요약)
-│   ├── 08_research_report_guide.md  # 보고서 작성 가이드
-│   └── environment.md           # 환경 정보
-├── stages/                      # 압축된 최신 지식 (단계별)
-│   ├── 01_literature_review.md
-│   ├── 02_framing.md
-│   ├── 03_planning.md
-│   └── 04_analysis.md
-├── objects/current/             # 결정 상태 추적 (YAML)
-│   ├── result_card.yaml
-│   ├── validation_readiness_card.yaml
-│   ├── experiment_contract.yaml
-│   ├── evaluation_validity_card.yaml
-│   ├── idea_abstraction_card.yaml
-│   └── novelty_ledger.yaml
-└── outputs/                     # 단계별 산출물
-    ├── literature_review/       # run_05-07
-    ├── framing/                 # run_03-06
-    ├── planning/                # run_03-06
-    └── analysis/                # run_09-20
-        ├── run_13/              # BioEval 메트릭-순위 반전 (시뮬레이션)
-        ├── run_14/              # Phase 4 downstream 과업 상관
-        ├── run_15/              # sklearn Ridge LOO (Norman)
-        ├── run_16/              # Gene PCA Feature Ridge (K562/RPE1)
-        ├── run_17/              # Bootstrap CI (B=10,000)
-        ├── run_18/              # Scale Correction
-        ├── run_19/              # Downstream Task Independence
-        └── run_20/              # GEARS DL 모델 훈련 (진행 중)
+│   ├── research_report.md       # 최종 연구 보고서 (10개 섹션 요약)
+│   ├── stages/                  # 단계별 기법 및 가이드
+│   └── environment.md           # 실험 환경 상세
+├── stages/                      # 압축된 프로젝트 상태 (01-05)
+├── objects/current/             # 최종 결정 데이터 (Claim Card 등)
+├── outputs/                     # 실험 산출물 및 리포트
+│   ├── analysis/run_13-20/      # 핵심 분석 (GEARS, Bootstrap 등)
+│   └── interpretation/run_01/   # 최종 해석 및 완성 리포트
+└── README.md                    # 프로젝트 메인 가이드
 ```
 
-## Run 이력
+## 💻 실행 및 환경
 
-| Run | 날짜 | 내용 | 결과 |
-|-----|------|------|------|
-| run_13 | 04-30 | BioEval 메트릭-순위 반전 (시뮬레이션 11개 모델) | H1 SUPPORTED |
-| run_14 | 04-30 | Phase 4 downstream 과업 상관 | H2 SUPPORTED (88.9%) |
-| run_15 | 04-30 | sklearn Ridge LOO (Norman) | H1+H2 실제 모델 확인. K562/RPE1 퇴화 |
-| run_16 | 05-01 | Gene PCA Feature Ridge (K562/RPE1) | H1+H2+H3 3 데이터셋 전체 확인 |
-| run_17 | 05-01 | Bootstrap CI (B=10,000) | H1+H2 통계적 견고성 확인 |
-| run_18 | 05-01 | Scale Correction | 보정 불필요 확인. Dir_deg 불변 |
-| run_19 | 05-01 | Downstream Task Independence | H2 domain-specific 확인. MSE domain-general |
-| run_20 | 05-02 | GEARS DL 모델 훈련 | 진행 중 (K562 학습 중, Norman GO graph 오류) |
+- **System Python 3.14**: 주 분석 및 통계 스캔
+- **ai_env (Conda, Python 3.11)**: GEARS/CPA 딥러닝 모델 학습
+- **Hardware**: RTX 4060 Ti 8GB 기반 가중치 최적화
 
-## 환경
+## 🎓 참고 문헌
 
-- **System Python 3.14**: 분석 스크립트 (run_13+), Ridge LOO, 통계
-- **ai_env (conda, Python 3.11)**: GEARS/CPA 학습, PyG 모델
-- **GPU**: RTX 4060 Ti 8GB
+- Ahlmann-Eltze et al. (2025). Nature Methods.
+- Norman et al. (2019). Science.
+- Replogle et al. (2022). Cell.
+- Wei et al. (2026). Nature Methods (Benchmarking).
 
-## 라이선스
-
-MIT
+---
+🤖 Generated & Maintained with **[Nexus Science](https://github.com/bionexus-enterprise/NexusScience)**

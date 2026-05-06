@@ -1,0 +1,51 @@
+# Context — 프로젝트 용어 사전
+# Framing 진입 시 초기화, Analysis 진행 중 업데이트
+
+project: BioEval — Biologically-Grounded Evaluation for Perturbation Prediction
+
+terms:
+  - name: BioEval
+    definition: 생물학적 충실도 기반 섭동 예측 평가 프레임워크 (Dir + DEG + Cal 3개 하위 지표)
+    avoid: [생물학적 평가, 바이오에발]
+
+  - name: BioEval-Dir
+    definition: 유전자×섭동 수준 방향 정확도. Dir_all(전체 유전자), Dir_deg(DEG만), Dir_weighted(|logFC| 가중) 하위구분
+    avoid: [방향 지표, direction metric]
+
+  - name: BioEval-DEG
+    definition: DEG 회복 정밀도 (AUPRC). DEG_auprc(기존), DEG_dir_auprc(방향 결합, 신규)
+    avoid: [DEG 지표]
+
+  - name: BioEval-Cal
+    definition: 효과 크기 보정 분석. 체계적 과소/과대 예측 탐지
+    avoid: [보정 지표]
+
+  - name: Mean-Effect Trap
+    definition: MSE가 비차별 유전자가 많은 데이터셋에서 평균 근처 예측에 보상을 주어 방향 정보를 상실시키는 현상
+    avoid: [평균 효과 함정, mean trap]
+
+  - name: 순위 반전
+    definition: 두 지표가 동일한 모델 집합을 다르게 순위 매기는 현상. Kendall τ < 0.7일 때 순위 불일치로 판정
+    avoid: [랭킹 역전, rank flip]
+
+  - name: downstream 과업
+    definition: 섭동 예측 결과를 생물학적 분석에 사용하는 과업 (f1@50, f1@100, dir_discovery_deg, mag_rank, top100_overlap)
+    avoid: [다운스트림 태스크]
+
+  - name: domain-specific
+    definition: BioEval 지표가 MSE보다 downstream 유용성을 더 잘 예측하는 범위가 동일 정보 도메인 내로 한정됨. Cross-domain에서는 MSE가 우수
+    avoid: [도메인 한정, 국소적]
+
+  - name: DEG
+    definition: Differentially Expressed Gene (차별 발현 유전자). |logFC| > 임계값(0.25)인 유전자
+    avoid: [차등발현유전자]
+
+flagged_ambiguities:
+  - expression: "충분한 증거"
+    concrete_definition: 각 가설별 허용 클레임 강도(STRONG/MODERATE/WEAK) 기준. STRONG=3+ 독립 데이터셋에서 통계적 유의성 확보. MODERATE=1-2 데이터셋 또는 domain-specific 제약 존재
+
+  - expression: "견고한"
+    concrete_definition: Bootstrap CI(B≥10,000)에서 95% CI가 0을 포함하지 않음
+
+  - expression: "모델 다양성"
+    concrete_definition: 순위 분석에 포함된 모델이 4개 이상이며, 적어도 2개 이상의 서로 다른 모델 클래스(예: 선형, DL, baseline)가 포함된 상태
